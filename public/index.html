@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseñas de Negocios</title>
+</head>
+<body>
+    <header>
+        <h1>Reseñas de Negocios</h1>
+        <div id="login-container">
+            <form id="login-form">
+                <input type="email" id="email" placeholder="Correo electrónico" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+            <button id="google-login">Iniciar con Google</button>
+            <button id="facebook-login">Iniciar con Facebook</button>
+        </div>
+    </header>
+    <div id="negocios-container">
+        <!-- Las tarjetas de negocios se cargarán aquí -->
+    </div>
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
