@@ -1,64 +1,63 @@
-import { auth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from './firebase.js';
-//Login Fb Google
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM completamente cargado'); // Verifica que el DOM esté listo
-
-    const googleLoginButton = document.getElementById('google-login');
-    const facebookLoginButton = document.getElementById('facebook-login');
-
-    if (googleLoginButton) {
-        
-        googleLoginButton.addEventListener('click', () => {
-            console.log('Clic en Google Login'); // Verifica que el evento se dispare
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    const user = result.user;
-                    console.log('Usuario logueado con Google:', user);
-                    alert(`Bienvenido, ${user.displayName}`);
-                })
-                .catch((error) => {
-                    console.error('Error en login con Google:', error);
-                    alert('Error al iniciar sesión con Google');
-                });
-        });
-    }
-
-    if (facebookLoginButton) {
-        facebookLoginButton.addEventListener('click', () => {
-            console.log('Clic en Facebook Login'); // Verifica que el evento se dispare
-            const provider = new FacebookAuthProvider();
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    const user = result.user;
-                    console.log('Usuario logueado con Facebook:', user);
-                    alert(`Bienvenido, ${user.displayName}`);
-                })
-                .catch((error) => {
-                    console.error('Error en login con Facebook:', error);
-                    alert('Error al iniciar sesión con Facebook');
-                });
-        });
-    }
-});
+import { auth, signInWithPopup, GoogleAuthProvider } from './firebase.js';
 
 //Base de datos
 document.addEventListener('DOMContentLoaded', () => {
+    // Verificar si hay un usuario logueado
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        console.log('Usuario ya logueado:', user.displayName);
+    }
+    
+    // Cargar negocios
     fetch('/api/negocios')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor: ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             const container = document.getElementById('negocios-container');
-            data.forEach(negocio => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <img src="${negocio.foto_portada}" alt="Foto de ${negocio.nombre}">
-                    <h2>${negocio.nombre}</h2>
-                    <p>${negocio.direccion}</p>
-                    <p class="rating">⭐ ${negocio.promedio_calificaciones || 'Sin calificaciones'}</p>
-                `;
-                container.appendChild(card);
-            });
+            if (container) {
+                if (data.length === 0) {
+                    container.innerHTML = '<p>No hay negocios disponibles actualmente</p>';
+                    return;
+                }
+                
+                data.forEach(negocio => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    
+                    // Imagen de respaldo si no hay foto
+                    const imgSrc = negocio.foto_portada || './img/default-restaurant.jpg';
+                    
+                    // Mostrar dirección completa o un mensaje por defecto
+                    const direccion = negocio.calle 
+                        ? `${negocio.calle} ${negocio.numero_exterior || ''}, ${negocio.colonia || ''}, ${negocio.municipio || ''}`
+                        : 'Dirección no disponible';
+                    
+                    // Formatear calificación
+                    const calificacion = negocio.promedio_calificaciones 
+                        ? parseFloat(negocio.promedio_calificaciones).toFixed(1) 
+                        : 'Sin calificaciones';
+                    
+                    card.innerHTML = `
+                        <img src="${imgSrc}" alt="Foto de ${negocio.nombre}" onerror="this.src='./img/default-restaurant.jpg'">
+                        <h2>${negocio.nombre}</h2>
+                        <p>${direccion}</p>
+                        <p class="rating">⭐ ${calificacion}</p>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                console.error('El contenedor de negocios no existe en el DOM');
+            }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error al cargar negocios:', error);
+            const container = document.getElementById('negocios-container');
+            if (container) {
+                container.innerHTML = '<p>Error al cargar los negocios. Por favor, intente más tarde.</p>';
+            }
+        });
 });

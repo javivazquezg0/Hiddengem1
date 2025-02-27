@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="Login.css">
+    <link rel="stylesheet" href="Navbar.css">
+    <link rel="icon" type="image/jpg/gif" href="../img/Logo"/>
+</head>
+<body>
+    <!-- Navbar structure remains the same -->
+    
+    <main>
+        <div class="contenedor__todo">
+            <div class="caja__trasera">
+                <div class="caja__trasera-login">
+                    <h3>Ya tienes una cuenta?</h3>
+                    <p>Inicia sesion para entrar a la pagina</p>
+                    <button id="btn__iniciar-sesion">Iniciar sesion</button>
+                </div>
+                <div class="caja__trasera-register">
+                    <h3>Aun no tienes una cuenta?</h3>
+                    <p>Registrate para que puedas inicar sesion</p>
+                    <button id="btn__register">Registrarse</button>
+                </div>
+            </div>
+            
+            <!--Formulario de Login y Register-->
+            <div class="contenedor__login-register">
+                <!--Login-->
+                <form action="" class="formulario__login">
+                    <h2>Iniciar sesion</h2>
+                    <input type="text" placeholder="Usuario">
+                    <input type="password" placeholder="Contrasena">
+                    <button>Entrar</button>
+                    
+                    <!-- Moved Google login button here for better visibility -->
+                    <div id="login-container">
+                        <button id="google-login" type="button">Iniciar con Google</button>
+                    </div>
+                </form>
+                
+                <!--Register-->
+                <form action="" class="formulario__register">
+                    <h2>Registrarse</h2>
+                    <input type="text" placeholder="Nombre Completo">
+                    <input type="text" placeholder="Correo Electronico">
+                    <input type="text" placeholder="Usuario">
+                    <input type="password" placeholder="Contrasena">
+                    <button>Registrarse</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Fix script loading order and paths -->
+    <script type="module" src="../firebase.js"></script>
+    <script type="module" src="./Java/Login.js"></script>
+    <script type="module" src="./Java/LoginGoogle.js"></script>
+</body>
+</html>

@@ -23,12 +23,12 @@ db.connect((err) => {
 // Middleware para parsear JSON
 app.use(express.json());
 
-// Servir archivos estáticos desde la carpeta "public"
-app.use(express.static('public'));
+// Servir archivos estáticos desde la carpeta raiz
+app.use(express.static('.'));
 
 // Ruta para servir el archivo index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 //Console.log para verificar que la solicitud a style.css se esta manejando correctamente

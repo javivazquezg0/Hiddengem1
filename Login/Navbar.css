@@ -1,0 +1,50 @@
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #ff66008f;
+    color: aliceblue;
+    position: fixed;  /* Hace que se mantenga fijo */
+    top: 0;           /* Se queda en la parte superior */
+    left: 0;          /* Se ajusta al lado izquierdo */
+    width: 100%;      /* Ocupará todo el ancho */
+    z-index: 1000;    /* Se mantiene sobre otros elementos */
+}
+
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: aliceblue;
+} 
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: aliceblue;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: rgb(230, 66, 66);
+}
+
+.burger {
+    display: none;
+    flex-direction: column;
+    gap: 0.3rem;
+    cursor: pointer;
+}
+
+.burger span {
+    width: 25px;
+    height: 3px;
+    background: rgba(231, 228, 228, 0.973);
+}
