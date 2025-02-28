@@ -1,55 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reseñas de Negocios</title>
     <link rel="icon" type="image/jpg/gif" href="img/Logo"/>
-          <!-- Navbar -->
-          <nav class="navbar">
-            <div class="logo">Hiddengem6</div>
-            <ul class="nav-links">
-                <li><a href="../index.html">Inicio</a></li>
-                <li><a href="./Login/Login.html">Registrate</a></li>
-                <li><a href="paginas/Restaurantes.html">Restaurantes</a></li>
-                <li><a href="paginas/Destacados.html">Destacados</a></li>
-                <li><a href="paginas/Blog.html">Blog</a></li>
-            </ul>
-            <button class="burger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </nav>
-        <!-- End Nav Bar -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Hiddengem6</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Inicio</a></li>
+            <li><a href="./Login/Login.html">Registrate</a></li>
+            <li><a href="paginas/Restaurantes.html">Restaurantes</a></li>
+            <li><a href="paginas/Destacados.html">Destacados</a></li>
+            <li><a href="paginas/Blog.html">Blog</a></li>
+        </ul>
+        <button class="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
 </head>
 <body>
-
-        
-               <!--Login Fb/Ggl
-                <div id="login-container">
-                    <form id="login-form">
-                        <input type="email" id="email" placeholder="Correo electrónico" required>
-                        <input type="password" id="password" placeholder="Contraseña" required>
-                        <button type="submit">Iniciar sesión</button>
-                    </form>
-                    <button id="google-login">Iniciar con Google</button>
-                    <button id="facebook-login">Iniciar con Facebook</button>
-                </div>
-            </header>
-            <div id="negocios-container">
-        --> 
-
-
-    <script src="./Java/scrip.js"></script>
     <header>
         <h1>Reseñas de Negocios</h1>
+    </header>
 
+    <!-- Contenedor añadido -->
+    <div id="negocios-container" class="cards-container"></div>
 
-
-        <!-- Las tarjetas de negocios se cargarán aquí -->
-    </div>
+    <!-- Scripts al final del body -->
     <script type="module" src="firebase.js"></script>
     <script type="module" src="script.js"></script>
 </body>

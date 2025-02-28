@@ -29,34 +29,33 @@
             <!--Formulario de Login y Register-->
             <div class="contenedor__login-register">
                 <!--Login-->
-                <form action="" class="formulario__login">
+                <form class="formulario__login">
                     <h2>Iniciar sesion</h2>
-                    <input type="text" placeholder="Usuario">
-                    <input type="password" placeholder="Contrasena">
+                    <input type="email" name="email" placeholder="Correo electrónico" required>
+                    <input type="password" name="password" placeholder="Contraseña" required>
                     <button>Entrar</button>
                     
-                    <!-- Moved Google login button here for better visibility -->
+                    <!-- Botón Google -->
                     <div id="login-container">
-                        <button id="google-login" type="button">Iniciar con Google</button>
+                      <button id="google-login" type="button">Iniciar con Google</button>
                     </div>
                 </form>
                 
                 <!--Register-->
-                <form action="" class="formulario__register">
+                <form class="formulario__register">
                     <h2>Registrarse</h2>
-                    <input type="text" placeholder="Nombre Completo">
-                    <input type="text" placeholder="Correo Electronico">
-                    <input type="text" placeholder="Usuario">
-                    <input type="password" placeholder="Contrasena">
-                    <button>Registrarse</button>
+                    <input type="text" name="display_name" placeholder="Nombre Completo" required>
+                    <input type="email" name="email" placeholder="Correo Electrónico" required>
+                    <input type="password" name="password" placeholder="Contraseña" required>
+                    <button type="submit">Registrarse</button>
                 </form>
             </div>
         </div>
     </main>
     
-    <!-- Fix script loading order and paths -->
+    <!-- script loading order and paths -->
     <script type="module" src="../firebase.js"></script>
-    <script type="module" src="./Java/Login.js"></script>
+    <script src="./Java/Login.js"></script>
     <script type="module" src="./Java/LoginGoogle.js"></script>
 </body>
 </html>
