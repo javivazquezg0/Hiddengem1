@@ -1,5 +1,5 @@
 header {
-    background-color: #333;
+    background-color: #333; /* Mantenido color oscuro */
     color: #fff;
     padding: 20px;
     text-align: center;
@@ -48,12 +48,9 @@ header {
     background-color: #db4437;
 }
 
-
 #google-login:hover {
     background-color: #c23321;
 }
-
-
 
 /*Navbar*/
 .navbar{
@@ -61,8 +58,8 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0rem;
-    background: #ff66008f;
-    color: aliceblue;
+    background: rgba(255, 140, 0, 0.9); /* Cambiado a nuevo naranja con opacidad */
+    color: #fff;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -70,7 +67,7 @@ header {
 .navbar .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: aliceblue;
+    color: #fff;
 } 
 .nav-links {
     list-style: none;
@@ -79,11 +76,11 @@ header {
 }
 .nav-links a {
     text-decoration: none;
-    color: aliceblue;
+    color: #fff;
     transition: color 0.3s;
 }
 .nav-links a:hover {
-    color: rgb(230, 66, 66);
+    color: #333; /* Cambiado a color oscuro */
 }
 
 .burger {
@@ -129,7 +126,7 @@ header {
 }
 
 .rating {
-    color: #ffd700;
+    color: #f0c14b; /* Amarillo/dorado para estrellas */
     font-weight: bold;
 }
 
@@ -170,7 +167,7 @@ legend {
 .btn-eliminar-horario {
     background: none;
     border: none;
-    color: #ff4444;
+    color: #dc3545; /* Rojo para botones de eliminar */
     cursor: pointer;
     padding: 0.5rem;
 }
@@ -180,8 +177,8 @@ legend {
     margin-top: 1rem;
     padding: 0.8rem;
     background-color: #f8f9fa;
-    border: 1px dashed #007bff;
-    color: #007bff;
+    border: 1px dashed #ff8c00; /* Nuevo color primario */
+    color: #ff8c00; /* Nuevo color primario */
 }
 
 /* Estilos adicionales para el formulario de registro */
@@ -229,7 +226,7 @@ legend {
     display: block;
     width: 100%;
     padding: 1rem;
-    background-color: #ff6600;
+    background-color: #ff8c00; /* Nuevo color primario */
     color: white;
     border: none;
     border-radius: 4px;
@@ -239,7 +236,7 @@ legend {
 }
 
 .btn-submit:hover {
-    background-color: #e65c00;
+    background-color: #e65c00; /* Nuevo color primario oscuro */
 }
 
 .hora-input {
@@ -324,47 +321,7 @@ legend {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: #ff4444;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    line-height: 20px;
-    cursor: pointer;
-}
-
-.help-text {
-    color: #666;
-    font-size: 0.8rem;
-    margin-top: 0.3rem;
-}
-/* Estilos para upload de imágenes */
-.image-upload-container {
-    margin-top: 0.5rem;
-}
-
-.image-preview-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 0.5rem;
-}
-
-.preview-item {
-    width: 120px;
-    height: 100px;
-    position: relative;
-    border: 1px solid #ddd;
-    background-size: cover;
-    background-position: center;
-}
-
-.remove-image {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ff4444;
+    background: #dc3545; /* Rojo para eliminar */
     color: white;
     border-radius: 50%;
     width: 20px;

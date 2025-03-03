@@ -200,27 +200,78 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
   console.log('Recibido en /api/negocios:', req.body);
   
   const { 
-      nombre, 
-      descripcion, 
-      calle, 
-      numero_exterior, 
-      numero_interior, 
-      colonia, 
-      codigo_postal, 
-      municipio, 
-      estado, 
-      telefono, 
-      correo, 
-      horarios 
-  } = req.body;
+    nombre, 
+    descripcion, 
+    calle, 
+    numero_exterior, 
+    numero_interior, 
+    colonia, 
+    codigo_postal, 
+    municipio, 
+    estado, 
+    telefono, 
+    correo
+    } = req.body;
 
-  if (!nombre || !calle || !horarios?.length) {
-      return res.status(400).json({ error: 'Campos requeridos faltantes' });
+  // Detectar y procesar los horarios, sea cual sea el formato en que lleguen
+  let horarios = [];
+  
+  // Caso 1: Los horarios vienen como un array de objetos (formato ideal)
+  if (req.body.horarios && Array.isArray(req.body.horarios)) {
+    horarios = req.body.horarios;
+  } 
+  // Caso 2: Los horarios vienen en arrays separados con notación de array (dia_inicio[], dia_fin[], etc.)
+  else if (req.body['dia_inicio[]']) {
+    // Convertir a array si es un solo valor
+    const diaInicio = Array.isArray(req.body['dia_inicio[]']) ? req.body['dia_inicio[]'] : [req.body['dia_inicio[]']];
+    const diaFin = Array.isArray(req.body['dia_fin[]']) ? req.body['dia_fin[]'] : [req.body['dia_fin[]']];
+    const apertura = Array.isArray(req.body['apertura[]']) ? req.body['apertura[]'] : [req.body['apertura[]']];
+    const cierre = Array.isArray(req.body['cierre[]']) ? req.body['cierre[]'] : [req.body['cierre[]']];
+    
+    // Construir array de horarios
+    for (let i = 0; i < diaInicio.length; i++) {
+      horarios.push({
+        dia: `${diaInicio[i]} a ${diaFin[i]}`,
+        apertura: apertura[i],
+        cierre: cierre[i]
+      });
+    }
+  }
+  // Caso 3: Los horarios vienen en arrays separados sin notación de array
+  else if (req.body.dia_inicio) {
+    // Convertir a array si es un solo valor
+    const diaInicio = Array.isArray(req.body.dia_inicio) ? req.body.dia_inicio : [req.body.dia_inicio];
+    const diaFin = Array.isArray(req.body.dia_fin) ? req.body.dia_fin : [req.body.dia_fin];
+    const apertura = Array.isArray(req.body.apertura) ? req.body.apertura : [req.body.apertura];
+    const cierre = Array.isArray(req.body.cierre) ? req.body.cierre : [req.body.cierre];
+    
+    // Construir array de horarios
+    for (let i = 0; i < diaInicio.length; i++) {
+      horarios.push({
+        dia: `${diaInicio[i]} a ${diaFin[i]}`,
+        apertura: apertura[i],
+        cierre: cierre[i]
+      });
+    }
+  }
+
+  // Validación de campos mínimos
+  if (!nombre || !calle) {
+    return res.status(400).json({ error: 'El nombre y la dirección son obligatorios' });
+  }
+
+  // Si no hay horarios definidos, crear un horario por defecto
+  if (horarios.length === 0) {
+    horarios = [{
+      dia: 'Lunes a Viernes',
+      apertura: '09:00',
+      cierre: '18:00'
+    }];
   }
 
   // Verificar que el usuario está autenticado
   if (!req.user || !req.user.id) {
-      return res.status(401).json({ error: 'Usuario no autenticado' });
+    return res.status(401).json({ error: 'Usuario no autenticado' });
   }
 
   // Transacción para garantizar integridad
@@ -325,25 +376,162 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
   });
 });
 
-// Obtener negocios
+// Obtener negocios (requiere autenticación)
 app.get('/api/negocios', (req, res) => {
   const query = `
-      SELECT n.*, 
-             AVG(r.calificacion) AS promedio_calificaciones, 
-             COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada
-      FROM negocios n
-      LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
-      LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
-      GROUP BY n.id_Negocios
+    SELECT n.*, 
+           AVG(r.calificacion) AS promedio_calificaciones, 
+           COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada
+    FROM negocios n
+    LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
+    LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+    GROUP BY n.id_Negocios
   `;
   db.query(query, (err, resultados) => {
-      if (err) {
-          console.error('Error al obtener los negocios:', err);
-          return res.status(500).json({ error: 'Error al obtener los negocios' });
-      }
-      res.json(resultados);
+    if (err) {
+      console.error('Error al obtener los negocios:', err);
+      return res.status(500).json({ error: 'Error al obtener los negocios' });
+    }
+    res.json(resultados);
   });
 });
+
+// CORREGIDO: Endpoint para negocios públicos
+app.get('/api/negocios/publicos', (req, res) => {
+  try {
+    // Consulta SQL mejorada con JOIN para obtener el horario de apertura y cierre del negocio
+    const query = `
+    SELECT 
+      n.id_Negocios,
+      n.nombre,
+      n.descripcion,
+      COALESCE(n.categoria, 'Restaurante') as categoria,
+      n.calle,
+      n.numero_exterior,
+      CONCAT(n.calle, ' ', n.numero_exterior, ', ', n.colonia) AS direccion,
+      n.colonia,
+      n.municipio,
+      n.estado,
+      n.telefono,
+      n.correo,
+      (SELECT hora_apertura FROM horarios_negocios WHERE id_Negocio = n.id_Negocios LIMIT 1) as horario_apertura,
+      (SELECT hora_cierre FROM horarios_negocios WHERE id_Negocio = n.id_Negocios LIMIT 1) as horario_cierre,
+      (SELECT url_foto FROM fotos_negocios WHERE id_Negocios = n.id_Negocios LIMIT 1) as imagen,
+      'default' as calificacion_texto,
+      4.5 as calificacion,
+      0 as total_resenas
+    FROM 
+      negocios n
+    GROUP BY 
+      n.id_Negocios
+    ORDER BY 
+      n.nombre ASC
+  `;
+    
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error al obtener negocios públicos:', err);
+        return res.status(500).json({ 
+          error: 'Error al obtener negocios públicos',
+          message: err.message
+        });
+      }
+
+      // Verificar si tenemos resultados
+      if (results.length === 0) {
+        return res.json([]);
+      }
+      
+      // Formatear resultados para que coincidan con lo esperado por el frontend
+      const negociosFormateados = results.map(negocio => {
+        // Asegurarse de que imagen contiene una ruta válida
+        let imagen = negocio.imagen;
+        
+        if (!imagen || imagen === null || imagen === '') {
+          // Asignar imagen por categoría
+          const categoria = (negocio.categoria || '').toLowerCase();
+          
+          if (categoria.includes('pizza')) {
+            imagen = '/img/PIZZA.jpg';
+          } else if (categoria.includes('taco')) {
+            imagen = '/img/TACOS.jpg';
+          } else if (categoria.includes('birria')) {
+            imagen = '/img/Birria1.jpg';
+          } else if (categoria.includes('pozole')) {
+            imagen = '/img/posole.jpg';
+          } else {
+            imagen = '/img/default-restaurant.jpg';
+          }
+        }
+        
+        // Si la ruta no comienza con / o http, agregarle /
+        if (imagen && !imagen.startsWith('/') && !imagen.startsWith('http')) {
+          imagen = '/' + imagen;
+        }
+        
+
+        
+
+        // Verificar si es una URL externa o una ruta local
+        if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
+          // Es una URL externa, mantenerla como está
+          console.log(`URL de imagen externa detectada: ${imagen}`);
+        } else {
+          // Es una ruta local, verificar si existe
+          const rutaImagen = path.join(__dirname, imagen.startsWith('/') ? imagen.substring(1) : imagen);
+          
+          // Si la imagen no existe, usar la imagen por defecto
+          if (!fs.existsSync(rutaImagen)) {
+            imagen = '/img/default-restaurant.jpg';
+            console.log(`Imagen no encontrada: ${rutaImagen}, usando imagen por defecto`);
+          }
+        }
+
+        return {
+          id_Negocios: negocio.id_Negocios,
+          nombre: negocio.nombre,
+          descripcion: negocio.descripcion,
+          categoria: negocio.categoria,
+          direccion: negocio.direccion,
+          telefono: negocio.telefono,
+          horario_apertura: negocio.horario_apertura || '09:00',
+          horario_cierre: negocio.horario_cierre || '22:00',
+          imagen: imagen,
+          calificacion: parseFloat(negocio.calificacion || 4.5).toFixed(1),
+          total_resenas: negocio.total_resenas || 0
+        };
+      });
+      
+      res.json(negociosFormateados);
+    });
+  } catch (error) {
+    console.error('Error en endpoint /api/negocios/publicos:', error);
+    res.status(500).json({ 
+      error: 'Error al obtener los negocios públicos',
+      message: error.message
+    });
+  }
+});
+
+
+// 3. Agrega este endpoint para manejar imágenes por defecto según categoría
+app.get('/api/imagen-categoria/:categoria', (req, res) => {
+  const categoria = req.params.categoria.toLowerCase();
+  let rutaImagen = 'img/default-restaurant.jpg';
+  
+  if (categoria.includes('pizza')) {
+    rutaImagen = 'img/PIZZA.jpg';
+  } else if (categoria.includes('taco')) {
+    rutaImagen = 'img/TACOS.jpg';
+  } else if (categoria.includes('birria')) {
+    rutaImagen = 'img/Birria1.jpg';
+  } else if (categoria.includes('pozole')) {
+    rutaImagen = 'img/posole.jpg';
+  }
+  
+  res.sendFile(path.join(__dirname, rutaImagen));
+});
+
 // Configurar almacenamiento para imágenes
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -357,6 +545,22 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const ext = path.extname(file.originalname);
     cb(null, 'negocio-' + uniqueSuffix + ext);
+  }
+});
+
+app.use(express.static(path.join(__dirname, '.')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+//Directorios necesarios para imagenes
+const directorios = [
+  './img',
+  './uploads',
+  './uploads/negocios'
+];
+
+directorios.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`Directorio creado: ${dir}`);
   }
 });
 
@@ -426,6 +630,324 @@ app.post('/api/negocios/:id/imagenes', authenticateToken, upload.array('imagenes
   });
 });
 
+// Endpoint para obtener detalle de un negocio específico
+app.get('/api/negocios/:id', async (req, res) => {
+  try {
+    const negocioId = req.params.id;
+    
+    // Consulta adaptada a tu estructura de base de datos
+    const query = `
+      SELECT 
+        n.*,
+        COALESCE(AVG(r.calificacion), 0) as promedio_calificaciones,
+        COUNT(r.id_Resenas) as total_resenas,
+        f.url_foto as foto_portada
+      FROM 
+        negocios n
+      LEFT JOIN 
+        resenas r ON n.id_Negocios = r.id_Negocios
+      LEFT JOIN 
+        fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+      WHERE 
+        n.id_Negocios = ?
+      GROUP BY 
+        n.id_Negocios
+    `;
+    
+    db.query(query, [negocioId], (err, negocios) => {
+      if (err) {
+        console.error('Error al obtener detalle del negocio:', err);
+        return res.status(500).json({ error: 'Error al obtener detalles del negocio' });
+      }
+      
+      if (negocios.length === 0) {
+        return res.status(404).json({ error: 'Negocio no encontrado' });
+      }
+      
+      const negocio = negocios[0];
+      
+      // Formatear la ruta de la imagen de portada
+      if (negocio.foto_portada && !negocio.foto_portada.startsWith('/') && !negocio.foto_portada.startsWith('http')) {
+        negocio.foto_portada = '/' + negocio.foto_portada;
+      }
+      
+      // Si no hay foto, usar una por defecto
+      if (!negocio.foto_portada) {
+        negocio.foto_portada = '/img/default-restaurant.jpg';
+      }
+      
+      // Formatear calificaciones
+      negocio.promedio_calificaciones = parseFloat(negocio.promedio_calificaciones).toFixed(1);
+      
+      // Obtener todas las imágenes del negocio
+      db.query('SELECT id_Fotos as id, url_foto as url, tipo FROM fotos_negocios WHERE id_Negocios = ?', 
+        [negocioId], 
+        (err, imagenes) => {
+          if (err) {
+            console.error('Error al obtener imágenes:', err);
+            // Continuar sin imágenes
+            negocio.imagenes = [];
+            return res.json(negocio);
+          }
+          
+          // Formatear las imágenes
+          const imagenesFormateadas = imagenes.map(img => {
+            if (img.url && !img.url.startsWith('/') && !img.url.startsWith('http')) {
+              img.url = '/' + img.url;
+            }
+            return {
+              id: img.id,
+              url: img.url,
+              es_portada: img.tipo === 'portada'
+            };
+          });
+          
+          // Añadir imágenes al objeto del negocio
+          negocio.imagenes = imagenesFormateadas;
+          negocio.categoria = 'Restaurante'; // Categoría por defecto
+          negocio.horario_cierre = '22:00'; // Horario por defecto
+          
+          res.json(negocio);
+        }
+      );
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener detalles del negocio:', error);
+    res.status(500).json({ 
+      error: 'Error al obtener detalles del negocio',
+      message: error.message
+    });
+  }
+});
+
+// Endpoint para actualizar un negocio
+app.put('/api/negocios/:id', authenticateToken, async (req, res) => {
+  try {
+    const negocioId = req.params.id;
+    const updateData = req.body;
+    
+    // Verificar que el negocio existe
+    db.query(
+      'SELECT id_Negocios FROM negocios WHERE id_Negocios = ?',
+      [negocioId],
+      (err, results) => {
+        if (err) {
+          console.error('Error al verificar negocio:', err);
+          return res.status(500).json({ error: 'Error interno del servidor' });
+        }
+        
+        if (results.length === 0) {
+          return res.status(404).json({ error: 'Negocio no encontrado' });
+        }
+        
+        // Filtrar solo los campos permitidos para actualización
+        const allowedFields = [
+          'nombre', 'descripcion', 'calle', 'numero_exterior', 'numero_interior',
+          'colonia', 'codigo_postal', 'municipio', 'estado', 'telefono', 'correo'
+        ];
+        
+        const filteredData = {};
+        for (const field of allowedFields) {
+          if (updateData[field] !== undefined) {
+            filteredData[field] = updateData[field];
+          }
+        }
+        
+        // Verificar que hay datos para actualizar
+        if (Object.keys(filteredData).length === 0) {
+          return res.status(400).json({ error: 'No se proporcionaron datos válidos para actualizar' });
+        }
+        
+        // Construir la consulta dinámica
+        const updateFields = Object.keys(filteredData)
+          .map(field => `${field} = ?`)
+          .join(', ');
+        
+        const updateValues = Object.values(filteredData);
+        updateValues.push(negocioId); // Para el WHERE id_Negocios = ?
+        
+        const query = `UPDATE negocios SET ${updateFields} WHERE id_Negocios = ?`;
+        
+        // Ejecutar la consulta
+        db.query(query, updateValues, (err, result) => {
+          if (err) {
+            console.error('Error al actualizar negocio:', err);
+            return res.status(500).json({ error: 'Error al actualizar el negocio' });
+          }
+          
+          if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'No se actualizó ningún negocio' });
+          }
+          
+          res.json({ 
+            message: 'Negocio actualizado correctamente',
+            negocioId 
+          });
+        });
+      }
+    );
+  } catch (error) {
+    console.error('Error al actualizar negocio:', error);
+    res.status(500).json({ 
+      error: 'Error al actualizar el negocio',
+      message: error.message
+    });
+  }
+});
+// Endpoint para servir imágenes de muestra
+app.get('/img/:imageName', (req, res) => {
+  const imageName = req.params.imageName;
+  const imagePath = path.join(__dirname, 'img', imageName);
+  
+  // Verificar si la imagen existe
+  fs.access(imagePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error('Imagen no encontrada:', imagePath);
+      // Usar una imagen por defecto si la solicitada no existe
+      return res.sendFile(path.join(__dirname, 'img', 'default-restaurant.jpg'));
+    }
+    res.sendFile(imagePath);
+  });
+});
+// Endpoint para obtener reseñas de un negocio
+app.get('/api/negocios/:id/resenas', async (req, res) => {
+  try {
+    const negocioId = req.params.id;
+    
+    // Consulta adaptada a tu estructura de base de datos actual
+    const query = `
+      SELECT 
+        r.*,
+        u.nombre_usuario as nombre_usuario
+      FROM 
+        resenas r
+      LEFT JOIN 
+        users u ON r.id_Usuario = u.id
+      WHERE 
+        r.id_Negocios = ?
+      ORDER BY 
+        r.fecha_resena DESC
+    `;
+    
+    db.query(query, [negocioId], (err, resenas) => {
+      if (err) {
+        console.error('Error al obtener reseñas:', err);
+        return res.status(500).json({ error: 'Error al obtener reseñas' });
+      }
+      
+      // Si no hay reseñas, devolver array vacío
+      if (resenas.length === 0) {
+        return res.json([]);
+      }
+      
+      // Formatear fechas y otros campos
+      const resenasFormateadas = resenas.map(resena => {
+        return {
+          ...resena,
+          fecha_creacion: resena.fecha_resena,
+          comentario: resena.comentario || 'Sin comentario',
+          nombre_usuario: resena.nombre_usuario || 'Usuario anónimo'
+        };
+      });
+      
+      res.json(resenasFormateadas);
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener reseñas:', error);
+    res.status(500).json({ 
+      error: 'Error al obtener reseñas',
+      message: error.message
+    });
+  }
+});
+
+// Endpoint para añadir una nueva reseña
+app.post('/api/negocios/:id/resenas', authenticateToken, async (req, res) => {
+  try {
+    const idNegocio = req.params.id;
+    const idUsuario = req.user.id; // Usando el objeto user del middleware authenticateToken
+    const { calificacion, comentario } = req.body;
+    
+    // Validar datos
+    if (!calificacion || !comentario) {
+      return res.status(400).json({ error: 'La calificación y el comentario son obligatorios' });
+    }
+    
+    if (calificacion < 1 || calificacion > 5) {
+      return res.status(400).json({ error: 'La calificación debe estar entre 1 y 5' });
+    }
+    
+    // Verificar si el negocio existe
+    db.query(
+      'SELECT id_Negocios FROM negocios WHERE id_Negocios = ?',
+      [idNegocio],
+      (err, negocios) => {
+        if (err) {
+          console.error('Error al verificar negocio:', err);
+          return res.status(500).json({ error: 'Error interno' });
+        }
+        
+        if (negocios.length === 0) {
+          return res.status(404).json({ error: 'Negocio no encontrado' });
+        }
+        
+        // Verificar si el usuario ya ha dejado una reseña
+        db.query(
+          'SELECT id_Resenas FROM resenas WHERE id_Negocios = ? AND id_Usuario = ?',
+          [idNegocio, idUsuario],
+          (err, resenas) => {
+            if (err) {
+              console.error('Error al verificar reseñas existentes:', err);
+              return res.status(500).json({ error: 'Error interno' });
+            }
+            
+            if (resenas.length > 0) {
+              // Actualizar reseña existente
+              db.query(
+                'UPDATE resenas SET calificacion = ?, comentario = ? WHERE id_Negocios = ? AND id_Usuario = ?',
+                [calificacion, comentario, idNegocio, idUsuario],
+                (err) => {
+                  if (err) {
+                    console.error('Error al actualizar reseña:', err);
+                    return res.status(500).json({ error: 'Error al actualizar reseña' });
+                  }
+                  
+                  res.json({ message: 'Reseña actualizada correctamente' });
+                }
+              );
+            } else {
+              // Crear nueva reseña
+              db.query(
+                'INSERT INTO resenas (id_Negocios, id_Usuario, calificacion, comentario, fecha_resena) VALUES (?, ?, ?, ?, NOW())',
+                [idNegocio, idUsuario, calificacion, comentario],
+                (err, result) => {
+                  if (err) {
+                    console.error('Error al crear reseña:', err);
+                    return res.status(500).json({ error: 'Error al crear reseña' });
+                  }
+                  
+                  res.status(201).json({ 
+                    message: 'Reseña creada correctamente',
+                    id_Resena: result.insertId
+                  });
+                }
+              );
+            }
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error('Error al crear/actualizar reseña:', error);
+    res.status(500).json({ 
+      error: 'Error al crear/actualizar la reseña',
+      message: error.message
+    });
+  }
+});
+
 // Manejador de errores global
 app.use((err, req, res, next) => {
   console.error('Error no controlado:', err);
@@ -438,5 +960,5 @@ app.use((err, req, res, next) => {
 // Iniciar servidor
 const PORT = 3001;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

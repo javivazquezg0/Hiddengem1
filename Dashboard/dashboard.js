@@ -582,11 +582,22 @@ if (btnConfirmarEliminar) {
             userData = await response.json();
             
             // Actualizar interfaz
-            usuarioActual.textContent = userData.user.displayName || userData.user.email;
+            const usuarioActualElement = document.getElementById('usuario-actual');
+        if (usuarioActualElement) {
+            usuarioActualElement.textContent = userData.user.displayName || userData.user.email;
+        }
             
             // Actualizar sección de perfil
-            document.getElementById('nombre-usuario').textContent = userData.user.displayName || 'Usuario';
-            document.getElementById('email-usuario').textContent = userData.user.email;
+            const nombreUsuarioElement = document.getElementById('nombre-usuario');
+            const emailUsuarioElement = document.getElementById('email-usuario');
+            
+            if (nombreUsuarioElement) {
+                nombreUsuarioElement.textContent = userData.user.displayName || 'Usuario';
+            }
+            
+            if (emailUsuarioElement) {
+                emailUsuarioElement.textContent = userData.user.email;
+            }
             
         } catch (error) {
             console.error('Error:', error);

@@ -5,26 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Negocio - HiddenGem</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../Nav-Bar/nav-bar.css">
+
     <link rel="icon" href="../img/Logo">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">Hiddengem6</div>
-        <ul class="nav-links">
-            <li><a href="../index.html">Inicio</a></li>
-            <li><a href="./Login/Login.html">Registrate</a></li>
-            <li><a href="/registrar-negocio.html">Registrar Negocio</a></li>
-            <li><a href="/Dashboard/dashboard.html"> Dashboard</a></li>
-            <li><a href="paginas/Restaurantes.html">Restaurantes</a></li>
-            <li><a href="paginas/Destacados.html">Destacados</a></li>
-            <li><a href="paginas/Blog.html">Blog</a></li>
-        </ul>
-        <button class="burger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </nav>
+       <!--Nav-var-->
+       <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <ion-icon id="cloud" name="fast-food-outline"></ion-icon>
+                <span>Juarnachaz</span>
+            </div>
+        </div>
+        <nav class="navegacion">
+            <ul>
+                <li>
+                    <a id="inicio" href="/index.html">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a id="login" href="/Login/Login.html">
+                        <ion-icon name="log-in-outline"></ion-icon>
+                        <span>Inicia sesi&oacute;n</span>
+                    </a>
+                </li>
+            <li>
+                <a href="../Registro/registrar-negocio.html">
+                    <ion-icon name="pin-outline"></ion-icon>
+                    <span>¡Registra tu negocio!</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Restaurantes/restaurantes.html">
+                    <ion-icon name="star-half-outline"></ion-icon>
+                    <span>Restaurantes</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Dashboard/dashboard.html">
+                    <ion-icon name="desktop-outline"></ion-icon>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <ion-icon name="storefront-outline"></ion-icon>
+                    <span>puestos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <ion-icon name="rocket-outline"></ion-icon>
+                    <span>¿quienes somos?</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="cerrar-sesion">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <span>Cerrar sesión</span>
+                </a>
+            </li>
+            </ul>
+        </nav>
+        <div>
+            <div class="linea"></div>
+            <div class="modo-oscuro">
+                <div class="info">
+                    <ion-icon name="moon-outline"></ion-icon>
+                    <span>darkmode</span>
+                </div>
+                <div class="switch">
+                    <div class="base">
+                        <div class="circulo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Nav-Bar-->
     <main class="form-container">
         <h1>Registra tu Negocio</h1>
         
@@ -158,6 +224,10 @@
     </main>
 
     <script src="../Registro/registrar-negocio.js"></script>
+    <script type="module" src="/Nav-Bar/nav-bar.js"></script>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
 </body>
 </html>

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Mantener el head igual al anterior, con CSS y meta tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurantes - HiddenGem6</title>
+    <!-- Ajuste de rutas relativas -->
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../Nav-Bar/nav-bar.css">
     <link rel="icon" href="../img/Logo">
 
     <!-- Font Awesome para íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
-    <!-- Mismos estilos que tenías antes -->
+    <!-- Mismo estilo CSS que antes -->
     <style>
         /* Estilos específicos para la página de restaurantes - Igual que antes */
         .page-header {
@@ -244,23 +245,87 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">Hiddengem6</div>
-        <ul class="nav-links">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="paginas/Restaurantes.html" class="active">Restaurantes</a></li>
-            <li><a href="paginas/Destacados.html">Destacados</a></li>
-            <li><a href="paginas/Blog.html">Blog</a></li>
-            <li><a href="Login/Login.html">Iniciar Sesión</a></li>
-            <li><a href="Dashboard/dashboard.html" id="mi-cuenta-link" style="display: none;">Mi Cuenta</a></li>
-        </ul>
-        <button class="burger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </nav>
-
+    <!--Nav-var-->
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <ion-icon id="cloud" name="fast-food-outline"></ion-icon>
+                <span>Juarnachaz</span>
+            </div>
+        </div>
+        <nav class="navegacion">
+            <ul>
+                <li>
+                    <a id="inicio" href="/index.html">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a id="login" href="/Login/Login.html">
+                        <ion-icon name="log-in-outline"></ion-icon>
+                        <span>Inicia sesi&oacute;n</span>
+                    </a>
+                </li>
+            <li>
+                <a href="../Registro/registrar-negocio.html">
+                    <ion-icon name="pin-outline"></ion-icon>
+                    <span>¡Registra tu negocio!</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Restaurantes/restaurantes.html">
+                    <ion-icon name="star-half-outline"></ion-icon>
+                    <span>Restaurantes</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Dashboard/dashboard.html">
+                    <ion-icon name="desktop-outline"></ion-icon>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <ion-icon name="storefront-outline"></ion-icon>
+                    <span>puestos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <ion-icon name="rocket-outline"></ion-icon>
+                    <span>¿quienes somos?</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="cerrar-sesion">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <span>Cerrar sesión</span>
+                </a>
+            </li>
+            </ul>
+        </nav>
+        <div>
+            <div class="linea"></div>
+            <div class="modo-oscuro">
+                <div class="info">
+                    <ion-icon name="moon-outline"></ion-icon>
+                    <span>darkmode</span>
+                </div>
+                <div class="switch">
+                    <div class="base">
+                        <div class="circulo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Nav-Bar-->
     <div class="page-header">
         <h1>Descubre los mejores restaurantes</h1>
     </div>
@@ -307,10 +372,11 @@
             <div class="footer-section">
                 <h3>Enlaces rápidos</h3>
                 <ul>
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="paginas/Restaurantes.html">Restaurantes</a></li>
-                    <li><a href="paginas/Destacados.html">Destacados</a></li>
-                    <li><a href="paginas/Blog.html">Blog</a></li>
+                    <!-- Corregir rutas de navegación en el footer -->
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="restaurantes.html">Restaurantes</a></li>
+                    <li><a href="destacados.html">Destacados</a></li>
+                    <li><a href="blog.html">Blog</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -338,8 +404,16 @@
         
         // Verificar si el usuario está logueado
         document.addEventListener('DOMContentLoaded', () => {
+            checkUserLogin();
+            
+            // Cargar los negocios
+            loadBusinesses();
+        });
+
+        // Función para verificar si el usuario está logueado
+        function checkUserLogin() {
             const token = localStorage.getItem('token');
-            const loginLink = document.querySelector('a[href="Login/Login.html"]');
+            const loginLink = document.querySelector('a[href="../Login/Login.html"]');
             const miCuentaLink = document.getElementById('mi-cuenta-link');
             
             if (token) {
@@ -351,10 +425,7 @@
                 if (loginLink) loginLink.style.display = 'inline-block';
                 if (miCuentaLink) miCuentaLink.style.display = 'none';
             }
-            
-            // Cargar los negocios
-            loadBusinesses();
-        });
+        }
 
         // Funcionalidad para el menú móvil
         const burger = document.querySelector('.burger');
@@ -386,8 +457,20 @@
                     throw new Error('Error al cargar los negocios');
                 }
                 
-                allBusinesses = await response.json();
+                const data = await response.json();
+                console.log('Datos recibidos del servidor:', data);
+                
+                // Asegurarse de que los datos estén en el formato correcto
+                allBusinesses = Array.isArray(data) ? data : [];
                 filteredBusinesses = [...allBusinesses];
+                
+                // Verificar si tenemos negocios
+                if (allBusinesses.length === 0) {
+                    console.warn('No se encontraron negocios en la respuesta de la API');
+                    // Cargar datos de ejemplo como fallback
+                    loadSampleBusinesses();
+                    return;
+                }
                 
                 // Cargar categorías únicas para el filtro
                 loadCategories();
@@ -396,7 +479,7 @@
                 displayBusinesses();
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al cargar los negocios:', error);
                 
                 // Si hay un error o no hay conexión, cargar datos de ejemplo para desarrollo
                 loadSampleBusinesses();
@@ -405,7 +488,8 @@
         
         // Función para cargar datos de ejemplo (para desarrollo)
         function loadSampleBusinesses() {
-            // Datos de muestra
+            console.log('Cargando datos de muestra...');
+            // Datos de muestra (igual que antes)
             allBusinesses = [
                 {
                     id_Negocios: 1,
@@ -417,7 +501,7 @@
                     colonia: "Centro",
                     municipio: "Ciudad",
                     estado: "Estado",
-                    foto_portada: "img/PIZZA.jpg",
+                    foto_portada: "../img/PIZZA.jpg",
                     promedio_calificaciones: 4.5,
                     total_resenas: 28,
                     horario_cierre: "22:30"
@@ -432,7 +516,7 @@
                     colonia: "Reforma",
                     municipio: "Ciudad",
                     estado: "Estado",
-                    foto_portada: "img/TACOS.jpg",
+                    foto_portada: "../img/TACOS.jpg",
                     promedio_calificaciones: 4.2,
                     total_resenas: 45,
                     horario_cierre: "22:00"
@@ -447,7 +531,7 @@
                     colonia: "Del Valle",
                     municipio: "Ciudad",
                     estado: "Estado",
-                    foto_portada: "img/Birria1.jpg",
+                    foto_portada: "../img/Birria1.jpg",
                     promedio_calificaciones: 4.7,
                     total_resenas: 36,
                     horario_cierre: "22:00"
@@ -462,84 +546,9 @@
                     colonia: "Centro",
                     municipio: "Ciudad",
                     estado: "Estado",
-                    foto_portada: "img/posole.jpg",
+                    foto_portada: "../img/posole.jpg",
                     promedio_calificaciones: 4.0,
                     total_resenas: 22,
-                    horario_cierre: "20:00"
-                },
-                {
-                    id_Negocios: 5,
-                    nombre: "Gorditas Doña Chela",
-                    descripcion: "Gorditas y burritos caseros",
-                    categoria: "Gorditas",
-                    calle: "Calle 5 de Mayo",
-                    numero_exterior: "654",
-                    colonia: "Centro",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "img/BurritosyGorditas.png",
-                    promedio_calificaciones: 4.3,
-                    total_resenas: 18,
-                    horario_cierre: "22:00"
-                },
-                {
-                    id_Negocios: 6,
-                    nombre: "Pizza Rápida",
-                    descripcion: "Pizza a domicilio",
-                    categoria: "Pizza",
-                    calle: "Av. Universidad",
-                    numero_exterior: "987",
-                    colonia: "Universidad",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "img/PIZZA.jpg",
-                    promedio_calificaciones: 3.8,
-                    total_resenas: 15,
-                    horario_cierre: "22:30"
-                },
-                {
-                    id_Negocios: 7,
-                    nombre: "Pizzeria Italiana",
-                    descripcion: "Auténtica pizza italiana",
-                    categoria: "Pizza",
-                    calle: "Plaza Central",
-                    numero_exterior: "234",
-                    colonia: "Plaza",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "img/PIZZA.jpg",
-                    promedio_calificaciones: 4.6,
-                    total_resenas: 32,
-                    horario_cierre: "22:30"
-                },
-                {
-                    id_Negocios: 8,
-                    nombre: "Posole Tradicional",
-                    descripcion: "El mejor posole de la región",
-                    categoria: "Pozole",
-                    calle: "Calle Reforma",
-                    numero_exterior: "543",
-                    colonia: "Reforma",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "img/posole.jpg",
-                    promedio_calificaciones: 4.1,
-                    total_resenas: 24,
-                    horario_cierre: "20:00"
-                },
-                {
-                    id_Negocios: 9,
-                    nombre: "Posole del Mercado",
-                    descripcion: "Pozole económico y sabroso",
-                    categoria: "Pozole",
-                    calle: "Mercado Central",
-                    numero_exterior: "12",
-                    colonia: "Centro",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "img/posole.jpg",
-                    promedio_calificaciones: 3.9,
-                    total_resenas: 19,
                     horario_cierre: "20:00"
                 }
             ];
@@ -558,7 +567,9 @@
             const filterCategory = document.getElementById('filter-category');
             
             // Obtener categorías únicas
-            const categories = [...new Set(allBusinesses.map(business => business.categoria))];
+            const categories = [...new Set(allBusinesses
+                .filter(business => business.categoria) // Filtrar solo negocios con categoría definida
+                .map(business => business.categoria))];
             
             // Crear opciones del select
             let categoryOptions = '<option value="">Todas las categorías</option>';
@@ -600,18 +611,28 @@
             let cardsHTML = '';
             
             businessesForCurrentPage.forEach(business => {
+                // Verificar que el negocio tenga datos válidos
+                if (!business) return;
+                
                 // Generar dirección completa
-                const direccion = `${business.calle} ${business.numero_exterior}, ${business.colonia}`;
+                const direccion = `${business.calle || ''} ${business.numero_exterior || ''}, ${business.colonia || ''}`;
                 
                 // Imagen por defecto si no hay portada
-                const imagenSrc = business.foto_portada || 'img/default-restaurant.jpg';
+                let imagenSrc = business.imagen;
+                if (!imagenSrc || imagenSrc === '') {
+                    imagenSrc = '/img/default-restaurant.jpg'; // Sin el "../"
+                }
+                // Verificar si la calificación está definida
+                const rating = business.promedio_calificaciones ? 
+                    (typeof business.promedio_calificaciones === 'number' ? 
+                        business.promedio_calificaciones : 
+                        parseFloat(business.promedio_calificaciones) || 0) : 0;
                 
                 cardsHTML += `
                     <div class="card" onclick="goToBusinessDetail(${business.id_Negocios})">
-                        <img src="${imagenSrc}" alt="${business.nombre}">
-                        <div class="card-body">
-                            <h3 class="card-title">${business.nombre}</h3>
-                            <div class="card-stars">${generateStars(business.promedio_calificaciones || 0)}</div>
+                    <img src="${imagenSrc}" alt="${business.nombre}" onerror="this.src='/img/default-restaurant.jpg'">
+                            <h3 class="card-title">${business.nombre || 'Restaurante'}</h3>
+                            <div class="card-stars">${generateStars(rating)}</div>
                             <div class="card-details">
                                 <i class="fas fa-utensils"></i> ${business.categoria || 'Restaurante'}
                             </div>
@@ -682,13 +703,19 @@
 
         // Función para ir al detalle del negocio
         function goToBusinessDetail(businessId) {
-            window.location.href = `paginas/detalle-negocio.html?id=${businessId}`;
+            window.location.href = `detalle-negocio.html?id=${businessId}`;
         }
 
         // Generar estrellas basadas en la calificación
         function generateStars(rating) {
+            // Asegurar que rating sea un número
+            rating = parseFloat(rating) || 0;
+            
+            // Limitar rating entre 0 y 5
+            rating = Math.max(0, Math.min(5, rating));
+            
             const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 !== 0;
+            const hasHalfStar = rating % 1 >= 0.5;
 
             let starsHTML = '';
 
@@ -743,17 +770,26 @@
             const ratingFilter = filterRating ? parseFloat(filterRating.value) : 0;
             
             filteredBusinesses = allBusinesses.filter(business => {
+                // Verificar que el negocio tenga datos válidos
+                if (!business) return false;
+                
                 // Filtro por texto
-                const matchesSearch = business.nombre.toLowerCase().includes(searchTerm) || 
-                                     business.descripcion.toLowerCase().includes(searchTerm) ||
-                                     (business.categoria && business.categoria.toLowerCase().includes(searchTerm));
+                const matchesSearch = 
+                    (business.nombre && business.nombre.toLowerCase().includes(searchTerm)) || 
+                    (business.descripcion && business.descripcion.toLowerCase().includes(searchTerm)) ||
+                    (business.categoria && business.categoria.toLowerCase().includes(searchTerm));
                 
                 // Filtro por categoría
-                const matchesCategory = categoryFilter === '' || business.categoria === categoryFilter;
+                const matchesCategory = categoryFilter === '' || 
+                    (business.categoria && business.categoria === categoryFilter);
                 
                 // Filtro por calificación
-                const matchesRating = ratingFilter === 0 || 
-                                     (business.promedio_calificaciones && business.promedio_calificaciones >= ratingFilter);
+                const rating = business.promedio_calificaciones ? 
+                    (typeof business.promedio_calificaciones === 'number' ? 
+                        business.promedio_calificaciones : 
+                        parseFloat(business.promedio_calificaciones) || 0) : 0;
+                
+                const matchesRating = ratingFilter === 0 || rating >= ratingFilter;
                 
                 return matchesSearch && matchesCategory && matchesRating;
             });
@@ -765,5 +801,9 @@
             displayBusinesses();
         }
     </script>
+        <script type="module" src="/Nav-Bar/nav-bar.js"></script>
+
+       <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+       <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

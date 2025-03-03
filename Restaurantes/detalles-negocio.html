@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Negocio - HiddenGem6</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../Nav-Bar/nav-bar.css">
+
+    <link rel="icon" href="../img/Logo">
+
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /* Estilos específicos para la página de detalle */
+        .business-detail-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .business-header {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+        }
+        
+        .business-image {
+            flex: 1;
+            min-width: 300px;
+            height: 300px;
+        }
+        
+        .business-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .business-info {
+            flex: 2;
+            padding: 2rem;
+            min-width: 300px;
+        }
+        
+        .business-name {
+            font-size: 2rem;
+            margin: 0 0 1rem;
+            color: #333;
+        }
+        
+        .business-category {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .business-rating {
+            color: gold;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .business-rating-text {
+            margin-left: 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .business-description {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .business-details {
+            margin-bottom: 1rem;
+        }
+        
+        .business-detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        
+        .business-detail-item i {
+            width: 25px;
+            margin-right: 10px;
+            color: #ff6600;
+        }
+        
+        .business-hours {
+            margin-top: 0.5rem;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+        
+        .section-title {
+            margin: 2rem 0 1rem;
+            color: #333;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 0.5rem;
+        }
+        
+        .review-form {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .star-rating {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        
+        .star-rating input {
+            display: none;
+        }
+        
+        .star-rating label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ddd;
+            padding: 0 0.1rem;
+        }
+        
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: gold;
+        }
+        
+        .reviews-container {
+            margin-top: 2rem;
+        }
+        
+        .review-card {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .review-author {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .review-date {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        .review-rating {
+            color: gold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .review-content {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn-submit {
+            padding: 0.75rem 1.5rem;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-submit:hover {
+            background-color: #e55c00;
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            width: 100%;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6600;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-container {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #ff6600;
+            text-decoration: none;
+        }
+        
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .gallery-container {
+            margin-top: 2rem;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .gallery-item {
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Modal para imagen ampliada */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .business-header {
+                flex-direction: column;
+            }
+            
+            .business-image {
+                height: 200px;
+            }
+            
+            .business-info {
+                padding: 1.5rem;
+            }
+            
+            .business-name {
+                font-size: 1.5rem;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .gallery-item {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+       <!--Nav-var-->
+       <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <ion-icon id="cloud" name="fast-food-outline"></ion-icon>
+                <span>Juarnachaz</span>
+            </div>
+        </div>
+        <nav class="navegacion">
+            <ul>
+                <li>
+                    <a id="inicio" href="/index.html">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a id="login" href="/Login/Login.html">
+                        <ion-icon name="log-in-outline"></ion-icon>
+                        <span>Inicia sesi&oacute;n</span>
+                    </a>
+                </li>
+            <li>
+                <a href="../Registro/registrar-negocio.html">
+                    <ion-icon name="pin-outline"></ion-icon>
+                    <span>¡Registra tu negocio!</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Restaurantes/restaurantes.html">
+                    <ion-icon name="star-half-outline"></ion-icon>
+                    <span>Restaurantes</span>
+                </a>
+            </li>
+            <li>
+                <a href="../Dashboard/dashboard.html">
+                    <ion-icon name="desktop-outline"></ion-icon>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <ion-icon name="storefront-outline"></ion-icon>
+                    <span>puestos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <ion-icon name="rocket-outline"></ion-icon>
+                    <span>¿quienes somos?</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="cerrar-sesion">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <span>Cerrar sesión</span>
+                </a>
+            </li>
+            </ul>
+        </nav>
+        <div>
+            <div class="linea"></div>
+            <div class="modo-oscuro">
+                <div class="info">
+                    <ion-icon name="moon-outline"></ion-icon>
+                    <span>darkmode</span>
+                </div>
+                <div class="switch">
+                    <div class="base">
+                        <div class="circulo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Nav-Bar-->
+    <div class="business-detail-container" id="business-detail-container">
+        <!-- Aquí se mostrará el contenido del negocio -->
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Modal para imágenes -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="expandedImage">
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Acerca de Hiddengem6</h3>
+                <p>Descubre los tesoros ocultos en tu ciudad. Desde restaurantes locales hasta experiencias únicas, te ayudamos a encontrar lo mejor que tu comunidad tiene para ofrecer.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Enlaces rápidos</h3>
+                <ul>
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="restaurantes.html">Restaurantes</a></li>
+                    <li><a href="destacados.html">Destacados</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <p><i class="fas fa-envelope"></i> info@hiddengem6.com</p>
+                <p><i class="fas fa-phone"></i> (123) 456-7890</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Hiddengem6. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Obtener el ID del negocio de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const businessId = urlParams.get('id');
+        
+        // Verificar si el usuario está logueado
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserLogin();
+            
+            // Cargar el detalle del negocio si hay un ID
+            if (businessId) {
+                loadBusinessDetail(businessId);
+            } else {
+                showError('No se encontró el negocio');
+            }
+        });
+        
+        // Función para verificar si el usuario está logueado
+        function checkUserLogin() {
+            const token = localStorage.getItem('token');
+            const loginLink = document.querySelector('a[href="../Login/Login.html"]');
+            const miCuentaLink = document.getElementById('mi-cuenta-link');
+            
+            if (token) {
+                // Usuario logueado
+                if (loginLink) loginLink.style.display = 'none';
+                if (miCuentaLink) miCuentaLink.style.display = 'inline-block';
+            } else {
+                // Usuario no logueado
+                if (loginLink) loginLink.style.display = 'inline-block';
+                if (miCuentaLink) miCuentaLink.style.display = 'none';
+            }
+        }
+        
+        // Funcionalidad para el menú móvil
+        const burger = document.querySelector('.burger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (burger) {
+            burger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                burger.classList.toggle('active');
+            });
+        }
+        
+        // Cargar detalle del negocio
+        async function loadBusinessDetail(id) {
+            try {
+                const container = document.getElementById('business-detail-container');
+                
+                // Mostrar loading
+                container.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                    </div>
+                `;
+                
+                // Obtener detalle del negocio
+                const response = await fetch(`http://localhost:3001/api/negocios/${id}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar el detalle del negocio');
+                }
+                
+                const business = await response.json();
+                displayBusinessDetail(business);
+                
+                // Cargar reseñas
+                loadReviews(id);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Si hay un error, cargar datos de ejemplo
+                loadSampleBusinessDetail();
+            }
+        }
+        
+        // Cargar reseñas del negocio
+        async function loadReviews(businessId) {
+            try {
+                const response = await fetch(`http://localhost:3001/api/negocios/${businessId}/resenas`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar las reseñas');
+                }
+                
+                const reviews = await response.json();
+                displayReviews(reviews);
+                
+            } catch (error) {
+                console.error('Error al cargar reseñas:', error);
+                
+                // Si hay un error, cargar reseñas de ejemplo
+                displaySampleReviews();
+            }
+        }
+        
+        // Mostrar detalle del negocio
+        function displayBusinessDetail(business) {
+            const container = document.getElementById('business-detail-container');
+            
+            // Generar dirección completa
+            const direccion = `${business.calle || ''} ${business.numero_exterior || ''}, ${business.colonia || ''}, ${business.municipio || ''}, ${business.estado || ''}`;
+            
+            // Imagen por defecto si no hay portada
+            let imagenSrc = business.imagen;
+            if (!imagenSrc || imagenSrc === '') {
+                imagenSrc = '/img/default-restaurant.jpg'; // Sin el "../"
+            }
+            // Verificar si la calificación está definida
+            const rating = business.promedio_calificaciones ? 
+                (typeof business.promedio_calificaciones === 'number' ? 
+                    business.promedio_calificaciones : 
+                    parseFloat(business.promedio_calificaciones) || 0) : 0;
+            
+            // Construir HTML del detalle
+            let html = `
+                <a href="restaurantes.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Volver a restaurantes
+                </a>
+                
+                <div class="business-header">
+                    <div class="business-image">
+                        <img src="${imagenSrc}" alt="${business.nombre}" onerror="this.src='../img/default-restaurant.jpg'">
+                    </div>
+                    <div class="business-info">
+                        <h1 class="business-name">${business.nombre || 'Restaurante'}</h1>
+                        <span class="business-category">${business.categoria || 'Restaurante'}</span>
+                        <div class="business-rating">
+                            ${generateStars(rating)}
+                            <span class="business-rating-text">${rating.toFixed(1)} (${business.total_resenas || 0} reseñas)</span>
+                        </div>
+                        <p class="business-description">${business.descripcion || 'Sin descripción disponible'}</p>
+                        <div class="business-details">
+                            <div class="business-detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${direccion}</span>
+                            </div>
+                            <div class="business-detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${business.telefono || 'No disponible'}</span>
+                            </div>
+                            <div class="business-detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>${business.correo || 'No disponible'}</span>
+                            </div>
+                            <div class="business-detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span class="business-hours">Abierto hasta las ${business.horario_cierre || '21:00'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Galería de imágenes (si hay disponibles)
+            if (business.imagenes && business.imagenes.length > 0) {
+                html += `
+                    <h2 class="section-title">Galería de imágenes</h2>
+                    <div class="gallery-container">
+                        <div class="gallery">
+                `;
+                
+                business.imagenes.forEach(imagen => {
+                    html += `
+                        <div class="gallery-item" onclick="expandImage('${imagen.url}')">
+                            <img src="${imagen.url}" alt="${business.nombre}" onerror="this.src='../img/default-restaurant.jpg'">
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Formulario de reseña
+            html += `
+                <h2 class="section-title">Deja tu reseña</h2>
+                <div class="review-form">
+                    <form id="review-form" onsubmit="submitReview(event, ${business.id_Negocios})">
+                        <div class="form-group">
+                            <label class="form-label">Calificación</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" required />
+                                <label for="star5" title="5 estrellas"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star4" name="rating" value="4" />
+                                <label for="star4" title="4 estrellas"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star3" name="rating" value="3" />
+                                <label for="star3" title="3 estrellas"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star2" name="rating" value="2" />
+                                <label for="star2" title="2 estrellas"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star1" name="rating" value="1" />
+                                <label for="star1" title="1 estrella"><i class="fas fa-star"></i></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="review-comment" class="form-label">Comentario</label>
+                            <textarea id="review-comment" name="comment" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">Enviar reseña</button>
+                    </form>
+                </div>
+                
+                <h2 class="section-title">Reseñas</h2>
+                <div class="reviews-container" id="reviews-container">
+                    <!-- Las reseñas se cargarán dinámicamente -->
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Actualizar el contenido
+            container.innerHTML = html;
+        }
+        
+        // Mostrar reseñas
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviews-container');
+            
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = `
+                    <p style="text-align: center; color: #666;">Aún no hay reseñas para este negocio. ¡Sé el primero en opinar!</p>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            reviews.forEach(review => {
+                const date = new Date(review.fecha_creacion || review.fecha_resena).toLocaleDateString();
+                
+                html += `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-author">${review.nombre_usuario || 'Usuario anónimo'}</span>
+                            <span class="review-date">${date}</span>
+                        </div>
+                        <div class="review-rating">
+                            ${generateStars(review.calificacion)}
+                        </div>
+                        <p class="review-content">${review.comentario}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Enviar reseña
+        async function submitReview(event, businessId) {
+            event.preventDefault();
+            
+            // Verificar si el usuario está logueado
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Debes iniciar sesión para dejar una reseña.');
+                window.location.href = '../Login/Login.html';
+                return;
+            }
+            
+            const form = event.target;
+            const rating = form.rating.value;
+            const comment = form.comment.value;
+            
+            try {
+                // Enviar reseña al servidor
+                const response = await fetch(`http://localhost:3001/api/negocios/${businessId}/resenas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        calificacion: parseInt(rating),
+                        comentario: comment
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al enviar la reseña');
+                }
+                
+                // Limpiar formulario
+                form.reset();
+                
+                // Recargar reseñas y detalle del negocio
+                loadBusinessDetail(businessId);
+                
+                alert('¡Gracias por tu reseña!');
+                
+            } catch (error) {
+                console.error('Error al enviar reseña:', error);
+                alert('No se pudo enviar la reseña. Por favor, inténtalo de nuevo.');
+            }
+        }
+        
+        // Cargar datos de ejemplo para desarrollo
+        function loadSampleBusinessDetail() {
+            const sampleBusiness = {
+                id_Negocios: 1,
+                nombre: "Pizzeria la Yemi",
+                descripcion: "Las mejores pizzas de la ciudad. Elaboradas con ingredientes frescos y masa artesanal horneada en horno de leña. Amplia variedad de sabores tradicionales e innovadores.",
+                categoria: "Pizza",
+                calle: "Av. Constitución",
+                numero_exterior: "123",
+                colonia: "Centro",
+                municipio: "Ciudad",
+                estado: "Estado",
+                telefono: "(123) 456-7890",
+                correo: "info@pizzeriayemi.com",
+                foto_portada: "../img/PIZZA.jpg",
+                promedio_calificaciones: 4.5,
+                total_resenas: 28,
+                horario_cierre: "22:30",
+                imagenes: [
+                    { url: "../img/PIZZA.jpg" },
+                    { url: "../img/TACOS.jpg" },
+                    { url: "../img/posole.jpg" }
+                ]
+            };
+            
+            displayBusinessDetail(sampleBusiness);
+            
+            // Mostrar reseñas de ejemplo
+            displaySampleReviews();
+        }
+        
+        // Mostrar reseñas de ejemplo (para desarrollo)
+        function displaySampleReviews() {
+            const sampleReviews = [
+                {
+                    id_Resena: 1,
+                    nombre_usuario: "Carlos Mendoza",
+                    calificacion: 5,
+                    comentario: "¡Excelente servicio y comida deliciosa! Sin duda regresaré pronto.",
+                    fecha_creacion: "2024-02-15T18:30:00Z"
+                },
+                {
+                    id_Resena: 2,
+                    nombre_usuario: "Ana García",
+                    calificacion: 4,
+                    comentario: "Muy buena la pizza, aunque tardaron un poco en atendernos. El sabor compensa la espera.",
+                    fecha_creacion: "2024-01-23T20:15:00Z"
+                },
+                {
+                    id_Resena: 3,
+                    nombre_usuario: "Roberto Juárez",
+                    calificacion: 5,
+                    comentario: "Las mejores pizzas que he probado en la ciudad. El servicio es excepcional y el ambiente muy agradable.",
+                    fecha_creacion: "2024-01-05T19:45:00Z"
+                }
+            ];
+            
+            displayReviews(sampleReviews);
+        }
+        
+        // Expandir imagen en modal
+        function expandImage(src) {
+            const modal = document.getElementById('imageModal');
+            const expandedImg = document.getElementById('expandedImage');
+            expandedImg.src = src;
+            modal.style.display = 'block';
+        }
+        
+        // Cerrar modal de imagen
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Generar estrellas basadas en la calificación
+        function generateStars(rating) {
+            // Asegurar que rating sea un número
+            rating = parseFloat(rating) || 0;
+            
+            // Limitar rating entre 0 y 5
+            rating = Math.max(0, Math.min(5, rating));
+            
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+
+            let starsHTML = '';
+
+            for (let i = 0; i < fullStars; i++) {
+                starsHTML += '<i class="fas fa-star"></i>';
+            }
+
+            if (hasHalfStar) {
+                starsHTML += '<i class="fas fa-star-half-alt"></i>';
+            }
+
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                starsHTML += '<i class="far fa-star"></i>';
+            }
+
+            return starsHTML;
+        }
+        
+        // Mostrar mensaje de error
+        function showError(message) {
+            const container = document.getElementById('business-detail-container');
+            container.innerHTML = `
+                <a href="restaurantes.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Volver a restaurantes
+                </a>
+                <div class="error-container">
+                    <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                    <h2>Error</h2>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    </script>
+        <script type="module" src="/Nav-Bar/nav-bar.js"></script>
+
+       <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+       <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
