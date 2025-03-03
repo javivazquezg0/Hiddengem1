@@ -261,3 +261,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+// Agregar esto al final del archivo JavaScript donde manejas el registro de negocio
+
+document.addEventListener('DOMContentLoaded', () => {
+    const formNegocio = document.getElementById('form-negocio');
+    
+    if (formNegocio) {
+        formNegocio.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Obtener los datos del formulario
+            const formData = new FormData(formNegocio);
+            const negocioData = {};
+            
+            for (const [key, value] of formData.entries()) {
+                negocioData[key] = value;
+            }
+            
+            try {
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    alert('No has iniciado sesión. Por favor, inicia sesión para registrar un negocio.');
+                    window.location.href = '/Login/Login.html';
+                    return;
+                }
+                
+                // Enviar datos al servidor
+                const response = await fetch('http://localhost:3001/api/negocios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(negocioData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al registrar el negocio');
+                }
+                
+                const responseData = await response.json();
+                
+                // Mostrar mensaje de éxito
+                alert('¡Negocio registrado exitosamente!');
+                
+                // Guardar el ID del negocio recién creado (opcional)
+                localStorage.setItem('idNegocioActual', responseData.id_Negocios);
+                
+                // Redireccionar al dashboard
+                window.location.href = '/dashboard.html';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Error: ${error.message}`);
+            }
+        });
+    }
+});

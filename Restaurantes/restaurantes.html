@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Mantener el head igual al anterior, con CSS y meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurantes - HiddenGem6</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../img/Logo">
+
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Mismos estilos que tenías antes -->
+    <style>
+        /* Estilos específicos para la página de restaurantes - Igual que antes */
+        .page-header {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: #f8f9fa;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: #333;
+        }
+        
+        .restaurants-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .filters-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .filters-bar select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        
+        .search-bar {
+            display: flex;
+            flex: 1;
+            max-width: 500px;
+            margin-right: 1rem;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .search-bar button {
+            padding: 0.6rem 1rem;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .card {
+            width: 280px;
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .card-body {
+            padding: 16px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .card-stars {
+            color: gold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .card-stars i {
+            margin-right: 2px;
+        }
+        
+        .card-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-details i {
+            margin-right: 8px;
+        }
+        
+        .open-status {
+            color: #4CAF50;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        
+        .category-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #666;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .pagination button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .pagination button.active {
+            background-color: #ff6600;
+            color: white;
+            border-color: #ff6600;
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            width: 100%;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6600;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            width: 100%;
+            color: #666;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .card {
+                width: calc(33.333% - 20px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .filters-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-bar {
+                width: 100%;
+                max-width: none;
+                margin-bottom: 1rem;
+                margin-right: 0;
+            }
+            
+            .card {
+                width: calc(50% - 15px);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Hiddengem6</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="paginas/Restaurantes.html" class="active">Restaurantes</a></li>
+            <li><a href="paginas/Destacados.html">Destacados</a></li>
+            <li><a href="paginas/Blog.html">Blog</a></li>
+            <li><a href="Login/Login.html">Iniciar Sesión</a></li>
+            <li><a href="Dashboard/dashboard.html" id="mi-cuenta-link" style="display: none;">Mi Cuenta</a></li>
+        </ul>
+        <button class="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <div class="page-header">
+        <h1>Descubre los mejores restaurantes</h1>
+    </div>
+
+    <div class="restaurants-container">
+        <div class="filters-bar">
+            <div class="search-bar">
+                <input type="text" id="search-restaurant" placeholder="Buscar restaurante...">
+                <button id="search-button"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-options">
+                <select id="filter-category">
+                    <option value="">Todas las categorías</option>
+                    <!-- Las categorías se cargarán dinámicamente -->
+                </select>
+                <select id="filter-rating">
+                    <option value="">Todas las calificaciones</option>
+                    <option value="4">4+ estrellas</option>
+                    <option value="3">3+ estrellas</option>
+                    <option value="2">2+ estrellas</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Este div contendrá las tarjetas generadas dinámicamente -->
+        <div class="card-container" id="card-container">
+            <!-- Inicialmente mostramos un indicador de carga -->
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Los botones de paginación se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Acerca de Hiddengem6</h3>
+                <p>Descubre los tesoros ocultos en tu ciudad. Desde restaurantes locales hasta experiencias únicas, te ayudamos a encontrar lo mejor que tu comunidad tiene para ofrecer.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Enlaces rápidos</h3>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="paginas/Restaurantes.html">Restaurantes</a></li>
+                    <li><a href="paginas/Destacados.html">Destacados</a></li>
+                    <li><a href="paginas/Blog.html">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <p><i class="fas fa-envelope"></i> info@hiddengem6.com</p>
+                <p><i class="fas fa-phone"></i> (123) 456-7890</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Hiddengem6. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Variables para la paginación
+        let currentPage = 1;
+        let itemsPerPage = 9;
+        let allBusinesses = [];
+        let filteredBusinesses = [];
+        
+        // Verificar si el usuario está logueado
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const loginLink = document.querySelector('a[href="Login/Login.html"]');
+            const miCuentaLink = document.getElementById('mi-cuenta-link');
+            
+            if (token) {
+                // Usuario logueado
+                if (loginLink) loginLink.style.display = 'none';
+                if (miCuentaLink) miCuentaLink.style.display = 'inline-block';
+            } else {
+                // Usuario no logueado
+                if (loginLink) loginLink.style.display = 'inline-block';
+                if (miCuentaLink) miCuentaLink.style.display = 'none';
+            }
+            
+            // Cargar los negocios
+            loadBusinesses();
+        });
+
+        // Funcionalidad para el menú móvil
+        const burger = document.querySelector('.burger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (burger) {
+            burger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                burger.classList.toggle('active');
+            });
+        }
+
+        // Función para cargar los negocios desde el servidor
+        async function loadBusinesses() {
+            try {
+                const cardContainer = document.getElementById('card-container');
+                
+                // Mostrar loading
+                cardContainer.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                    </div>
+                `;
+                
+                // Obtener los negocios del servidor
+                const response = await fetch('http://localhost:3001/api/negocios/publicos');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar los negocios');
+                }
+                
+                allBusinesses = await response.json();
+                filteredBusinesses = [...allBusinesses];
+                
+                // Cargar categorías únicas para el filtro
+                loadCategories();
+                
+                // Mostrar los negocios
+                displayBusinesses();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Si hay un error o no hay conexión, cargar datos de ejemplo para desarrollo
+                loadSampleBusinesses();
+            }
+        }
+        
+        // Función para cargar datos de ejemplo (para desarrollo)
+        function loadSampleBusinesses() {
+            // Datos de muestra
+            allBusinesses = [
+                {
+                    id_Negocios: 1,
+                    nombre: "Pizzeria la Yemi",
+                    descripcion: "Las mejores pizzas de la ciudad",
+                    categoria: "Pizza",
+                    calle: "Av. Constitución",
+                    numero_exterior: "123",
+                    colonia: "Centro",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/PIZZA.jpg",
+                    promedio_calificaciones: 4.5,
+                    total_resenas: 28,
+                    horario_cierre: "22:30"
+                },
+                {
+                    id_Negocios: 2,
+                    nombre: "Taqueria Javi",
+                    descripcion: "Tacos tradicionales",
+                    categoria: "Tacos",
+                    calle: "Calle Juárez",
+                    numero_exterior: "456",
+                    colonia: "Reforma",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/TACOS.jpg",
+                    promedio_calificaciones: 4.2,
+                    total_resenas: 45,
+                    horario_cierre: "22:00"
+                },
+                {
+                    id_Negocios: 3,
+                    nombre: "Birria Don Juan",
+                    descripcion: "La mejor birria de la zona",
+                    categoria: "Birria",
+                    calle: "Av. Insurgentes",
+                    numero_exterior: "789",
+                    colonia: "Del Valle",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/Birria1.jpg",
+                    promedio_calificaciones: 4.7,
+                    total_resenas: 36,
+                    horario_cierre: "22:00"
+                },
+                {
+                    id_Negocios: 4,
+                    nombre: "El Pozolero",
+                    descripcion: "Pozole tradicional mexicano",
+                    categoria: "Pozole",
+                    calle: "Calle Hidalgo",
+                    numero_exterior: "321",
+                    colonia: "Centro",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/posole.jpg",
+                    promedio_calificaciones: 4.0,
+                    total_resenas: 22,
+                    horario_cierre: "20:00"
+                },
+                {
+                    id_Negocios: 5,
+                    nombre: "Gorditas Doña Chela",
+                    descripcion: "Gorditas y burritos caseros",
+                    categoria: "Gorditas",
+                    calle: "Calle 5 de Mayo",
+                    numero_exterior: "654",
+                    colonia: "Centro",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/BurritosyGorditas.png",
+                    promedio_calificaciones: 4.3,
+                    total_resenas: 18,
+                    horario_cierre: "22:00"
+                },
+                {
+                    id_Negocios: 6,
+                    nombre: "Pizza Rápida",
+                    descripcion: "Pizza a domicilio",
+                    categoria: "Pizza",
+                    calle: "Av. Universidad",
+                    numero_exterior: "987",
+                    colonia: "Universidad",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/PIZZA.jpg",
+                    promedio_calificaciones: 3.8,
+                    total_resenas: 15,
+                    horario_cierre: "22:30"
+                },
+                {
+                    id_Negocios: 7,
+                    nombre: "Pizzeria Italiana",
+                    descripcion: "Auténtica pizza italiana",
+                    categoria: "Pizza",
+                    calle: "Plaza Central",
+                    numero_exterior: "234",
+                    colonia: "Plaza",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/PIZZA.jpg",
+                    promedio_calificaciones: 4.6,
+                    total_resenas: 32,
+                    horario_cierre: "22:30"
+                },
+                {
+                    id_Negocios: 8,
+                    nombre: "Posole Tradicional",
+                    descripcion: "El mejor posole de la región",
+                    categoria: "Pozole",
+                    calle: "Calle Reforma",
+                    numero_exterior: "543",
+                    colonia: "Reforma",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/posole.jpg",
+                    promedio_calificaciones: 4.1,
+                    total_resenas: 24,
+                    horario_cierre: "20:00"
+                },
+                {
+                    id_Negocios: 9,
+                    nombre: "Posole del Mercado",
+                    descripcion: "Pozole económico y sabroso",
+                    categoria: "Pozole",
+                    calle: "Mercado Central",
+                    numero_exterior: "12",
+                    colonia: "Centro",
+                    municipio: "Ciudad",
+                    estado: "Estado",
+                    foto_portada: "img/posole.jpg",
+                    promedio_calificaciones: 3.9,
+                    total_resenas: 19,
+                    horario_cierre: "20:00"
+                }
+            ];
+            
+            filteredBusinesses = [...allBusinesses];
+            
+            // Cargar categorías únicas para el filtro
+            loadCategories();
+            
+            // Mostrar los negocios
+            displayBusinesses();
+        }
+        
+        // Cargar categorías únicas para el filtro
+        function loadCategories() {
+            const filterCategory = document.getElementById('filter-category');
+            
+            // Obtener categorías únicas
+            const categories = [...new Set(allBusinesses.map(business => business.categoria))];
+            
+            // Crear opciones del select
+            let categoryOptions = '<option value="">Todas las categorías</option>';
+            
+            categories.forEach(category => {
+                categoryOptions += `<option value="${category}">${category}</option>`;
+            });
+            
+            // Agregar opciones al select
+            filterCategory.innerHTML = categoryOptions;
+        }
+
+        // Mostrar los negocios con paginación
+        function displayBusinesses() {
+            const cardContainer = document.getElementById('card-container');
+            const paginationContainer = document.getElementById('pagination');
+            
+            // Calcular índices de inicio y fin para la página actual
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            
+            // Obtener los negocios para la página actual
+            const businessesForCurrentPage = filteredBusinesses.slice(startIndex, endIndex);
+            
+            // Verificar si hay negocios para mostrar
+            if (businessesForCurrentPage.length === 0) {
+                cardContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                        <h3>No se encontraron negocios</h3>
+                        <p>Intenta con otra búsqueda o filtro</p>
+                    </div>
+                `;
+                paginationContainer.innerHTML = '';
+                return;
+            }
+            
+            // Generar HTML para las tarjetas
+            let cardsHTML = '';
+            
+            businessesForCurrentPage.forEach(business => {
+                // Generar dirección completa
+                const direccion = `${business.calle} ${business.numero_exterior}, ${business.colonia}`;
+                
+                // Imagen por defecto si no hay portada
+                const imagenSrc = business.foto_portada || 'img/default-restaurant.jpg';
+                
+                cardsHTML += `
+                    <div class="card" onclick="goToBusinessDetail(${business.id_Negocios})">
+                        <img src="${imagenSrc}" alt="${business.nombre}">
+                        <div class="card-body">
+                            <h3 class="card-title">${business.nombre}</h3>
+                            <div class="card-stars">${generateStars(business.promedio_calificaciones || 0)}</div>
+                            <div class="card-details">
+                                <i class="fas fa-utensils"></i> ${business.categoria || 'Restaurante'}
+                            </div>
+                            <div class="card-details">
+                                <i class="fas fa-map-marker-alt"></i> ${direccion}
+                            </div>
+                            <span class="category-tag">${business.categoria || 'Restaurante'}</span>
+                            <p class="open-status"><i class="fas fa-clock"></i> Abierto hasta las ${business.horario_cierre || '21:00'}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Actualizar el contenido del contenedor de tarjetas
+            cardContainer.innerHTML = cardsHTML;
+            
+            // Generar paginación
+            generatePagination();
+        }
+        
+        // Generar la paginación
+        function generatePagination() {
+            const paginationContainer = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredBusinesses.length / itemsPerPage);
+            
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `
+                    <button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            paginationHTML += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            
+            paginationContainer.innerHTML = paginationHTML;
+        }
+        
+        // Cambiar de página
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredBusinesses.length / itemsPerPage);
+            
+            if (page < 1 || page > totalPages) {
+                return;
+            }
+            
+            currentPage = page;
+            displayBusinesses();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Función para ir al detalle del negocio
+        function goToBusinessDetail(businessId) {
+            window.location.href = `paginas/detalle-negocio.html?id=${businessId}`;
+        }
+
+        // Generar estrellas basadas en la calificación
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+
+            let starsHTML = '';
+
+            for (let i = 0; i < fullStars; i++) {
+                starsHTML += '<i class="fas fa-star"></i>';
+            }
+
+            if (hasHalfStar) {
+                starsHTML += '<i class="fas fa-star-half-alt"></i>';
+            }
+
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                starsHTML += '<i class="far fa-star"></i>';
+            }
+
+            return starsHTML;
+        }
+
+        // Filtro de búsqueda
+        const searchInput = document.getElementById('search-restaurant');
+        const searchButton = document.getElementById('search-button');
+        
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyFilters();
+                }
+            });
+        }
+        
+        if (searchButton) {
+            searchButton.addEventListener('click', applyFilters);
+        }
+
+        // Filtros de categoría y calificación
+        const filterCategory = document.getElementById('filter-category');
+        const filterRating = document.getElementById('filter-rating');
+
+        if (filterCategory) {
+            filterCategory.addEventListener('change', applyFilters);
+        }
+
+        if (filterRating) {
+            filterRating.addEventListener('change', applyFilters);
+        }
+
+        // Función para aplicar filtros
+        function applyFilters() {
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const categoryFilter = filterCategory ? filterCategory.value : '';
+            const ratingFilter = filterRating ? parseFloat(filterRating.value) : 0;
+            
+            filteredBusinesses = allBusinesses.filter(business => {
+                // Filtro por texto
+                const matchesSearch = business.nombre.toLowerCase().includes(searchTerm) || 
+                                     business.descripcion.toLowerCase().includes(searchTerm) ||
+                                     (business.categoria && business.categoria.toLowerCase().includes(searchTerm));
+                
+                // Filtro por categoría
+                const matchesCategory = categoryFilter === '' || business.categoria === categoryFilter;
+                
+                // Filtro por calificación
+                const matchesRating = ratingFilter === 0 || 
+                                     (business.promedio_calificaciones && business.promedio_calificaciones >= ratingFilter);
+                
+                return matchesSearch && matchesCategory && matchesRating;
+            });
+            
+            // Resetear a la primera página
+            currentPage = 1;
+            
+            // Mostrar negocios filtrados
+            displayBusinesses();
+        }
+    </script>
+</body>
+</html>

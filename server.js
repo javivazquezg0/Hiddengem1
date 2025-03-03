@@ -33,7 +33,7 @@ db.getConnection((err, connection) => {
 // Middlewares
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000', // Ajusta esto a la URL de tu frontend
+  origin: 'http://localhost:3001', // Ajusta esto a la URL de tu frontend
   credentials: true
 }));
 

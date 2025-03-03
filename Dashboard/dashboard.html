@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Administra tus Negocios</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="icon" href="../img/Logo">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Hiddengem6</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Inicio</a></li>
+            <li><a href="../Login/Login.html">Registrate</a></li>
+            <li><a href="../registrar-negocio.html">Registrar Negocio</a></li>
+            <li><a href="../Dashboard/dashboard.html"> Dashboard</a></li>
+
+            <li><a href="paginas/Restaurantes.html">Restaurantes</a></li>
+            <li><a href="paginas/Destacados.html">Destacados</a></li>
+            <li><a href="paginas/Blog.html">Blog</a></li>
+            <li><a href="#" id="usuario-actual"></a></li>
+            <li><a href="#" id="cerrar-sesion">Cerrar sesión</a></li>
+        </ul>
+        <button class="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <main class="dashboard-container">
+        <div class="sidebar">
+            <h3>Tu Panel</h3>
+            <ul class="sidebar-menu">
+                <li class="active" data-tab="mis-negocios">Mis Negocios</li>
+                <li data-tab="registrar-negocio">Registrar Nuevo</li>
+                <li data-tab="estadisticas">Estadísticas</li>
+                <li data-tab="mi-perfil">Mi Perfil</li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <!-- Sección: Mis Negocios -->
+            <section id="mis-negocios" class="tab-content active">
+                <h2>Mis Negocios</h2>
+                <div class="search-filter">
+                    <input type="text" id="buscar-negocio" placeholder="Buscar negocio...">
+                </div>
+                
+                <div id="lista-negocios" class="negocios-grid">
+                    <!-- Los negocios se cargarán dinámicamente desde JavaScript -->
+                    <div class="loading">Cargando tus negocios...</div>
+                </div>
+            </section>
+
+            <!-- Sección: Registrar Nuevo Negocio -->
+            <section id="registrar-negocio" class="tab-content">
+                <h2>Registrar Nuevo Negocio</h2>
+                <p>Puedes registrar un nuevo negocio haciendo click en el botón:</p>
+                <a href="../registrar-negocio.html" class="btn-primary">Registrar Nuevo Negocio</a>
+            </section>
+
+            <!-- Sección: Estadísticas -->
+            <section id="estadisticas" class="tab-content">
+                <h2>Estadísticas</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Negocios</h3>
+                        <div class="stat-value" id="total-negocios">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Visitas</h3>
+                        <div class="stat-value" id="total-visitas">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Calificación Media</h3>
+                        <div class="stat-value" id="calificacion-media">0.0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Reseñas</h3>
+                        <div class="stat-value" id="total-resenas">0</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Próximamente gráficos estadísticos</h3>
+                    <p>Estamos trabajando para ofrecerte visualizaciones detalladas de tus negocios.</p>
+                </div>
+            </section>
+
+            <!-- Sección: Mi Perfil -->
+            <section id="mi-perfil" class="tab-content">
+                <h2>Mi Perfil</h2>
+                <div class="profile-card">
+                    <div class="profile-info">
+                        <h3 id="nombre-usuario">Cargando...</h3>
+                        <p id="email-usuario">Cargando...</p>
+                        <hr>
+                        <form id="form-cambiar-password">
+                            <h4>Cambiar Contraseña</h4>
+                            <div class="form-group">
+                                <label for="password-actual">Contraseña Actual</label>
+                                <input type="password" id="password-actual" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevo-password">Nueva Contraseña</label>
+                                <input type="password" id="nuevo-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmar-password">Confirmar Nueva Contraseña</label>
+                                <input type="password" id="confirmar-password" required>
+                            </div>
+                            <button type="submit" class="btn-primary">Cambiar Contraseña</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="modal-detalle-negocio" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-nombre-negocio">Nombre del Negocio</h2>
+            
+            <div class="tabs">
+                <div class="tab-header">
+                    <div class="tab-btn active" data-tab="informacion">Información</div>
+                    <div class="tab-btn" data-tab="imagenes">Imágenes</div>
+                    <div class="tab-btn" data-tab="horarios">Horarios</div>
+                </div>
+                
+                <div class="tab-body">
+                    <!-- Tab Información -->
+                    <div class="tab-panel active" id="informacion">
+                        <div class="negocio-detalle-info">
+                            <div class="info-item">
+                                <strong>Dirección:</strong>
+                                <p id="modal-direccion"></p>
+                            </div>
+                            <div class="info-item">
+                                <strong>Descripción:</strong>
+                                <p id="modal-descripcion"></p>
+                            </div>
+                            <div class="info-item">
+                                <strong>Contacto:</strong>
+                                <p id="modal-contacto"></p>
+                            </div>
+                            <div class="info-item">
+                                <strong>Calificación:</strong>
+                                <p id="modal-calificacion"></p>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="btn-editar-info" class="btn-primary">Editar Información</button>
+                            <button id="btn-eliminar-negocio" class="btn-danger">Eliminar Negocio</button>
+                        </div>
+                    </div>
+
+
+                    
+                    <!-- Agregar este código dentro del modal-detalle-negocio, después del tab-panel de información -->
+
+<div id="modal-editar-info" class="modal-edicion" style="display: none;">
+    <div class="modal-edicion-content">
+        <span class="close-modal-edicion">&times;</span>
+        <h3>Editar Información del Negocio</h3>
+        
+        <form id="form-editar-negocio">
+            <div class="form-group">
+                <label for="editar-nombre">Nombre del Negocio</label>
+                <input type="text" id="editar-nombre" name="nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editar-descripcion">Descripción</label>
+                <textarea id="editar-descripcion" name="descripcion" rows="4" required></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group form-group-half">
+                    <label for="editar-calle">Calle</label>
+                    <input type="text" id="editar-calle" name="calle" required>
+                </div>
+                <div class="form-group form-group-half">
+                    <label for="editar-numero-exterior">Número Exterior</label>
+                    <input type="text" id="editar-numero-exterior" name="numero_exterior" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group form-group-half">
+                    <label for="editar-colonia">Colonia</label>
+                    <input type="text" id="editar-colonia" name="colonia" required>
+                </div>
+                <div class="form-group form-group-half">
+                    <label for="editar-municipio">Municipio</label>
+                    <input type="text" id="editar-municipio" name="municipio" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group form-group-half">
+                    <label for="editar-estado">Estado</label>
+                    <input type="text" id="editar-estado" name="estado" required>
+                </div>
+                <div class="form-group form-group-half">
+                    <label for="editar-codigo-postal">Código Postal</label>
+                    <input type="text" id="editar-codigo-postal" name="codigo_postal" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group form-group-half">
+                    <label for="editar-telefono">Teléfono</label>
+                    <input type="tel" id="editar-telefono" name="telefono" required>
+                </div>
+                <div class="form-group form-group-half">
+                    <label for="editar-correo">Correo Electrónico</label>
+                    <input type="email" id="editar-correo" name="correo" required>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="btn-cancelar-edicion" class="btn-secondary">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+                    <!-- Tab Imágenes -->
+                    <div class="tab-panel" id="imagenes">
+                        <div id="galeria-imagenes" class="galeria-imagenes">
+                            <!-- Las imágenes se cargarán dinámicamente -->
+                        </div>
+                        <div class="upload-section">
+                            <h4>Subir Nuevas Imágenes</h4>
+                            <form id="form-upload-imagenes">
+                                <div class="file-input-container">
+                                    <label for="nuevas-imagenes" class="file-input-label">
+                                        <i class="fas fa-images"></i> Seleccionar Imágenes
+                                    </label>
+                                    <input type="file" id="nuevas-imagenes" name="imagenes" multiple accept="image/*">
+                                </div>
+                                <div class="file-input-info">
+                                    Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB por imagen.
+                                </div>
+                                
+                                <!-- Aquí se insertará la vista previa de imágenes -->
+                                
+                                <div class="form-actions" style="justify-content: flex-start; margin-top: 1rem;">
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-upload"></i> Subir Imágenes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Horarios -->
+                    <div class="tab-panel" id="horarios">
+                        <div id="lista-horarios" class="lista-horarios">
+                            <!-- Los horarios se cargarán dinámicamente -->
+                        </div>
+                        <div class="action-buttons">
+                            <button id="btn-editar-horarios" class="btn-primary">Editar Horarios</button>
+                        </div>
+                    </div>
+                    <!-- Agregar este código dentro del modal-detalle-negocio, después del tab-panel de horarios -->
+
+<div id="modal-editar-horarios" class="modal-edicion" style="display: none;">
+    <div class="modal-edicion-content">
+        <span class="close-modal-edicion-horarios">&times;</span>
+        <h3>Editar Horarios</h3>
+        
+        <form id="form-editar-horarios">
+            <div class="horarios-grid">
+                <!-- Lunes -->
+                <div class="horario-dia">
+                    <h4>Lunes</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_lunes" id="abierto-lunes" checked> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-lunes">Apertura</label>
+                            <input type="time" id="hora-apertura-lunes" name="hora_apertura_lunes" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-lunes">Cierre</label>
+                            <input type="time" id="hora-cierre-lunes" name="hora_cierre_lunes" value="18:00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Martes -->
+                <div class="horario-dia">
+                    <h4>Martes</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_martes" id="abierto-martes" checked> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-martes">Apertura</label>
+                            <input type="time" id="hora-apertura-martes" name="hora_apertura_martes" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-martes">Cierre</label>
+                            <input type="time" id="hora-cierre-martes" name="hora_cierre_martes" value="18:00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Miércoles -->
+                <div class="horario-dia">
+                    <h4>Miércoles</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_miercoles" id="abierto-miercoles" checked> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-miercoles">Apertura</label>
+                            <input type="time" id="hora-apertura-miercoles" name="hora_apertura_miercoles" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-miercoles">Cierre</label>
+                            <input type="time" id="hora-cierre-miercoles" name="hora_cierre_miercoles" value="18:00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Jueves -->
+                <div class="horario-dia">
+                    <h4>Jueves</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_jueves" id="abierto-jueves" checked> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-jueves">Apertura</label>
+                            <input type="time" id="hora-apertura-jueves" name="hora_apertura_jueves" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-jueves">Cierre</label>
+                            <input type="time" id="hora-cierre-jueves" name="hora_cierre_jueves" value="18:00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Viernes -->
+                <div class="horario-dia">
+                    <h4>Viernes</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_viernes" id="abierto-viernes" checked> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-viernes">Apertura</label>
+                            <input type="time" id="hora-apertura-viernes" name="hora_apertura_viernes" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-viernes">Cierre</label>
+                            <input type="time" id="hora-cierre-viernes" name="hora_cierre_viernes" value="18:00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sábado -->
+                <div class="horario-dia">
+                    <h4>Sábado</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_sabado" id="abierto-sabado" checked> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-sabado">Apertura</label>
+                            <input type="time" id="hora-apertura-sabado" name="hora_apertura_sabado" value="10:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-sabado">Cierre</label>
+                            <input type="time" id="hora-cierre-sabado" name="hora_cierre_sabado" value="15:00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Domingo -->
+                <div class="horario-dia">
+                    <h4>Domingo</h4>
+                    <div class="horario-estado">
+                        <label>
+                            <input type="checkbox" name="abierto_domingo" id="abierto-domingo"> Abierto
+                        </label>
+                    </div>
+                    <div class="horario-horas">
+                        <div class="form-group">
+                            <label for="hora-apertura-domingo">Apertura</label>
+                            <input type="time" id="hora-apertura-domingo" name="hora_apertura_domingo" value="10:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-cierre-domingo">Cierre</label>
+                            <input type="time" id="hora-cierre-domingo" name="hora_cierre_domingo" value="15:00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="btn-cancelar-edicion-horarios" class="btn-secondary">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar Horarios</button>
+            </div>
+        </form>
+    </div>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal-confirmar-eliminacion" class="modal">
+        <div class="modal-content modal-sm">
+            <span class="close-modal-eliminar">&times;</span>
+            <h3>Eliminar Negocio</h3>
+            <p class="mensaje-confirmacion">¿Estás seguro de que deseas eliminar este negocio? Esta acción no se puede deshacer.</p>
+            <p class="nombre-negocio-eliminar"></p>
+            
+            <div class="form-group">
+                <label for="confirmar-eliminar">Escribe "ELIMINAR" para confirmar:</label>
+                <input type="text" id="confirmar-eliminar" placeholder="ELIMINAR">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="btn-cancelar-eliminar" class="btn-secondary">Cancelar</button>
+                <button type="button" id="btn-confirmar-eliminar" class="btn-danger" disabled>Eliminar Negocio</button>
+            </div>
+        </div>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html>
