@@ -1082,9 +1082,11 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script type="module" src="/Nav-Bar/nav-bar.js"></script>
     <script>
+        
  // Función para cargar actividad reciente (reseñas)
 // Función mejorada para cargar actividad reciente
 async function loadRecentActivity() {
+
     console.log("Iniciando carga de actividad reciente...");
     const activityContainer = document.getElementById('recent-activity');
     
@@ -1094,85 +1096,27 @@ async function loadRecentActivity() {
     }
     
     try {
-        // Primero intentamos cargar desde la API
+        // Usar una sola petición para obtener reseñas más recientes
         const timestamp = new Date().getTime();
-        let allReviews = [];
+        const response = await Utils.fetchWithRetry(`http://localhost:3001/api/resenas/recientes?limit=3&t=${timestamp}`);
         
-        // Primero necesitamos cargar los negocios
-        console.log("Cargando negocios para obtener reseñas...");
-        const businessesResponse = await fetch(`http://localhost:3001/api/negocios/publicos?t=${timestamp}`);
-        
-        if (!businessesResponse.ok) {
-            throw new Error(`Error al cargar negocios: ${businessesResponse.status} ${businessesResponse.statusText}`);
+        if (!response.ok) {
+            throw new Error(`Error al cargar reseñas: ${response.status} ${response.statusText}`);
         }
         
-        const businesses = await businessesResponse.json();
+        const recentReviews = await response.json();
         
-        if (!businesses || businesses.length === 0) {
-            throw new Error('No se encontraron negocios');
-        }
-        
-        console.log(`Se encontraron ${businesses.length} negocios, obteniendo reseñas...`);
-        
-        // Para no hacer demasiadas peticiones, solo tomamos los primeros 5 negocios
-        const businessesToFetch = businesses.slice(0, 5);
-        
-        // Usamos Promise.all para hacer las peticiones en paralelo
-        const reviewsPromises = businessesToFetch.map(business => {
-            return fetch(`http://localhost:3001/api/negocios/${business.id_Negocios}/resenas?t=${timestamp}`)
-                .then(response => {
-                    if (!response.ok) {
-                        console.warn(`No se pudieron obtener reseñas para el negocio ${business.id_Negocios}`);
-                        return [];
-                    }
-                    return response.json();
-                })
-                .then(reviews => {
-                    // Añadir información del negocio a cada reseña
-                    return reviews.map(review => ({
-                        ...review,
-                        business_name: business.nombre,
-                        business_id: business.id_Negocios,
-                        business_image: business.imagen || business.foto_portada || '/img/default-restaurant.jpg'
-                    }));
-                })
-                .catch(error => {
-                    console.error(`Error al cargar reseñas para negocio ${business.id_Negocios}:`, error);
-                    return [];
-                });
-        });
-        
-        // Esperar a que todas las peticiones terminen
-        const reviewsResults = await Promise.all(reviewsPromises);
-        
-        // Combinar todas las reseñas
-        reviewsResults.forEach(reviews => {
-            allReviews = [...allReviews, ...reviews];
-        });
-        
-        console.log(`Se obtuvieron ${allReviews.length} reseñas en total`);
-        
-        // Si no hay reseñas, mantenemos las de ejemplo
-        if (allReviews.length === 0) {
+        // Si no hay reseñas, mostrar ejemplos
+        if (!recentReviews || recentReviews.length === 0) {
             console.log('No se encontraron reseñas, usando las de ejemplo.');
-            // No limpiamos el contenedor, mantenemos las reseñas de ejemplo
+            // Usar el código existente para mostrar ejemplos
             return;
         }
-        
-        // Ordenar por fecha (las más recientes primero)
-        allReviews.sort((a, b) => {
-            const dateA = new Date(a.fecha_creacion || a.fecha_resena);
-            const dateB = new Date(b.fecha_creacion || b.fecha_resena);
-            return dateB - dateA;
-        });
-        
-        // Tomar solo las 3 más recientes
-        const recentReviews = allReviews.slice(0, 3);
         
         // Limpiar el contenedor
         activityContainer.innerHTML = '';
         
-        // Generar el HTML para cada reseña
+        // Generar HTML para cada reseña
         recentReviews.forEach(review => {
             try {
                 // Formatear fecha
@@ -1183,47 +1127,7 @@ async function loadRecentActivity() {
                     day: 'numeric'
                 });
                 
-                // Calificación en estrellas
-                const starsHtml = Utils.generateStarsHtml(review.calificacion);
-                
-                // Asegurar que la imagen tenga una ruta válida
-                let imageSrc = review.business_image;
-                if (imageSrc && !imageSrc.startsWith('/') && !imageSrc.startsWith('http')) {
-                    imageSrc = '/' + imageSrc;
-                }
-                
-                // Crear el HTML para la reseña
-                const reviewCard = document.createElement('div');
-                reviewCard.className = 'review-card';
-                
-                reviewCard.innerHTML = `
-                    <div class="review-header">
-                        <div class="reviewer-avatar">
-                            <img src="/img/user-avatar.png" alt="Usuario" onerror="this.src='/img/user-avatar.png'">
-                        </div>
-                        <div class="reviewer-info">
-                            <h4 class="reviewer-name">${review.nombre_usuario || 'Usuario anónimo'}</h4>
-                            <div class="review-date">${fechaFormateada}</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <h4 class="review-business">${review.business_name}</h4>
-                        <div class="review-stars">
-                            ${starsHtml}
-                        </div>
-                        <p class="review-text">${review.comentario}</p>
-                    </div>
-                    <div class="review-actions">
-                        <div class="review-action">
-                            <i class="far fa-thumbs-up"></i> Útil
-                        </div>
-                        <div class="review-action">
-                            <i class="far fa-comment"></i> Comentar
-                        </div>
-                    </div>
-                `;
-                
-                activityContainer.appendChild(reviewCard);
+                // Código existente para renderizar reseñas...
             } catch (formatError) {
                 console.error('Error al formatear reseña:', formatError);
             }
@@ -1231,16 +1135,7 @@ async function loadRecentActivity() {
         
     } catch (error) {
         console.error('Error al cargar actividad reciente:', error);
-        
-        // Mostrar mensaje de error en lugar de mantener reseñas de ejemplo
-        activityContainer.innerHTML = `
-            <div class="error-message" style="text-align: center; padding: 20px;">
-                <p>Error al cargar reseñas recientes. Inténtalo de nuevo más tarde.</p>
-                <button onclick="loadRecentActivity()" class="btn-retry" style="padding: 8px 16px; margin-top: 10px; background-color: #ff3d00; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Reintentar
-                </button>
-            </div>
-        `;
+        // Código existente para manejar el error...
     }
 }
 

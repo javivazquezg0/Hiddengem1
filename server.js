@@ -118,37 +118,39 @@ app.post('/api/login', async (req, res) => {
         console.log(`Usuario encontrado, verificando contraseña`);
         
         try {
-          const validPassword = await bcrypt.compare(password, user.password);
-          
-          if (!validPassword) {
-            console.log(`Contraseña inválida para usuario: ${email}`);
-            return res.status(401).json({ error: 'Credenciales inválidas' });
-          }
-          
-          // Generar token con más información
-          const secretKey = process.env.JWT_SECRET || 'tu_secreto_super_seguro';
-          console.log(`Usando clave secreta para JWT: ${secretKey.substring(0, 3)}...`);
-          
-          const token = jwt.sign(
-            { 
-              id: user.id, 
-              email: user.email,
-              displayName: user.display_name
-            },
-            secretKey,
-            { expiresIn: '24h' } // Aumentamos tiempo de expiración a 24 horas
-          );
-          
-          console.log(`Login exitoso para usuario: ${email}, token generado`);
-          
-          res.json({ 
-            token, 
-            user: { 
-              id: user.id,
-              displayName: user.display_name, 
-              email: user.email 
-            } 
-          });
+                          const validPassword = await bcrypt.compare(password, user.password);
+                          
+                          if (!validPassword) {
+                              console.log(`Contraseña inválida para usuario: ${email}`);
+                              return res.status(401).json({ error: 'Credenciales inválidas' });
+                          }
+                          
+                          // Generar token JWT
+                          const secretKey = process.env.JWT_SECRET || 'tu_secreto_super_seguro';
+                          const token = jwt.sign(
+                            { 
+                                id: user.id,
+                                email: user.email,
+                                displayName: user.display_name,
+                                provider: 'local'
+                            },
+                            secretKey,
+                            { 
+                                expiresIn: '24h',
+                                algorithm: 'HS256'
+                            }
+                          );
+                          
+                          console.log(`Login exitoso para usuario: ${email}, token generado`);
+                          
+                          res.json({ 
+                              token, 
+                              user: { 
+                                  id: user.id,
+                                  displayName: user.display_name, 
+                                  email: user.email 
+                              } 
+                          });
         } catch (bcryptError) {
           console.error('Error al verificar contraseña:', bcryptError);
           return res.status(500).json({ error: 'Error al verificar credenciales' });
@@ -193,6 +195,134 @@ app.post('/api/register', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Error en el servidor' });
   }
+});
+
+// Endpoint para autenticación con Google
+app.post('/api/auth/google', async (req, res) => {
+  try {
+      const { uid, email, displayName, photoURL } = req.body;
+      
+      console.log('Datos recibidos de Google:', req.body);
+      
+      if (!email) {
+          return res.status(400).json({ error: 'Email es requerido' });
+      }
+      
+      // Primero, verificar si el usuario ya existe (por email, independiente del provider)
+      db.execute(
+          'SELECT * FROM users WHERE email = ?',
+          [email],
+          async (error, results) => {
+              if (error) {
+                  console.error('Error de base de datos en login con Google:', error);
+                  return res.status(500).json({ error: 'Error en el servidor' });
+              }
+              
+              let userId;
+              
+              if (results.length === 0) {
+                  // El usuario no existe en absoluto, crearlo
+                  console.log('Creando nuevo usuario de Google:', email);
+                  try {
+                      // Hacemos un console.log del query para depuración
+                      const query = 'INSERT INTO users (email, display_name, provider, photo_url) VALUES (?, ?, ?, ?)';
+                      const params = [email, displayName || email.split('@')[0], 'google', photoURL || null];
+                      console.log('Query de inserción:', query);
+                      console.log('Parámetros:', params);
+                      
+                      const insertResult = await new Promise((resolve, reject) => {
+                          db.execute(
+                              query,
+                              params,
+                              (err, result) => {
+                                  if (err) {
+                                      console.error('Error SQL al crear usuario de Google:', err);
+                                      reject(err);
+                                  } else {
+                                      resolve(result);
+                                  }
+                              }
+                          );
+                      });
+                      
+                      userId = insertResult.insertId;
+                      console.log('Usuario creado con ID:', userId);
+                  } catch (dbError) {
+                      console.error('Error detallado al crear usuario de Google:', dbError);
+                      return res.status(500).json({ error: 'Error al crear usuario: ' + dbError.message });
+                  }
+              } else {
+                  // El usuario ya existe, actualizarlo para usar Google si es necesario
+                  userId = results[0].id;
+                  console.log('Usuario existente encontrado con ID:', userId);
+                  
+                  // Si el usuario existe pero no es de Google, actualizar su provider
+                  if (results[0].provider !== 'google') {
+                      try {
+                          await new Promise((resolve, reject) => {
+                              db.execute(
+                                  'UPDATE users SET provider = ?, photo_url = ? WHERE id = ?',
+                                  ['google', photoURL || null, userId],
+                                  (err, result) => {
+                                      if (err) {
+                                          console.error('Error al actualizar usuario a Google:', err);
+                                          reject(err);
+                                      } else {
+                                          resolve(result);
+                                      }
+                                  }
+                              );
+                          });
+                          console.log('Usuario actualizado a provider Google');
+                      } catch (updateError) {
+                          console.error('Error al actualizar usuario:', updateError);
+                          // Continuamos incluso si la actualización falla
+                      }
+                  }
+              }
+              
+              // Generar token JWT
+              const secretKey = process.env.JWT_SECRET || 'tu_secreto_super_seguro';
+              const token = jwt.sign(
+                { 
+                    id: userId,
+                    email: email,
+                    displayName: displayName,
+                    provider: 'google'
+                },
+                secretKey,
+                { 
+                    expiresIn: '24h',
+                    algorithm: 'HS256'
+                }
+            );
+            
+            // El middleware authenticateToken ya está definido al inicio del archivo
+              console.log('Login exitoso con Google, token generado para usuario:', email);
+              
+              res.json({ 
+                  token, 
+                  user: { 
+                      id: userId,
+                      displayName: displayName, 
+                      email: email,
+                      photoURL: photoURL
+                  } 
+              });
+          }
+      );
+  } catch (err) {
+      console.error('Error en ruta de autenticación Google:', err);
+      res.status(500).json({ error: 'Error en el servidor: ' + err.message });
+  }
+});
+
+// Ruta para depurar - quitar en producción
+app.get('/api/debug-token', authenticateToken, (req, res) => {
+  res.json({
+    message: 'Detalles del token',
+    user: req.user
+  });
 });
 
 // Ruta para registrar negocios
@@ -362,60 +492,112 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
   });
 });
 
-// Obtener negocios (requiere autenticación)
-app.get('/api/negocios', authenticateToken, (req, res) => {
-  getAllUserBusinesses(req.user.id, res);
-});  
-
 // Esta función es útil si tienes usuarios que podrían usar tanto login local como Google
 function getAllUserBusinesses(userId, res) {
-  // Esta consulta busca negocios relacionados con el usuario por ambos campos: id_user e id_Usuario
-  const query = `
-    SELECT n.*, 
-           AVG(r.calificacion) AS promedio_calificaciones, 
-           COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada
-    FROM negocios n
-    LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
-    LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
-    WHERE n.id_user = ? OR n.id_Usuario = ?
-    GROUP BY n.id_Negocios
-  `;
+  console.log('getAllUserBusinesses llamada para usuario ID:', userId);
   
-  db.query(query, [userId, userId], (err, resultados) => {
-    if (err) {
-      console.error('Error al obtener los negocios:', err);
-      return res.status(500).json({ error: 'Error al obtener los negocios' });
-    }
+  try {
+    // Consulta simplificada para usar solo id_user
+    const query = `
+      SELECT n.*, 
+             AVG(r.calificacion) AS promedio_calificaciones, 
+             COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada
+      FROM negocios n
+      LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
+      LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+      WHERE n.id_user = ?
+      GROUP BY n.id_Negocios
+    `;
     
-    console.log(`Negocios encontrados (ambos tipos de login) para usuario ${userId}: ${resultados.length}`);
-    res.json(resultados);
-  });
-}
-// Esta función es útil si tienes usuarios que podrían usar tanto login local como Google
-function getAllUserBusinesses(userId, res) {
-  // Esta consulta busca negocios relacionados con el usuario por ambos campos: id_user e id_Usuario
-  const query = `
-    SELECT n.*, 
-           AVG(r.calificacion) AS promedio_calificaciones, 
-           COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada
-    FROM negocios n
-    LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
-    LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
-    WHERE n.id_user = ? OR n.id_Usuario = ?
-    GROUP BY n.id_Negocios
-  `;
-  
-  db.query(query, [userId, userId], (err, resultados) => {
-    if (err) {
-      console.error('Error al obtener los negocios:', err);
-      return res.status(500).json({ error: 'Error al obtener los negocios' });
-    }
+    console.log('Ejecutando consulta con parámetro id_user:', userId);
     
-    console.log(`Negocios encontrados (ambos tipos de login) para usuario ${userId}: ${resultados.length}`);
-    res.json(resultados);
-  });
+    db.query(query, [userId], (err, resultados) => {
+      if (err) {
+        console.error('Error en consulta SQL:', err);
+        return res.status(500).json({ error: 'Error al obtener los negocios: ' + err.message });
+      }
+      
+      console.log(`Negocios encontrados para usuario ${userId}: ${resultados.length}`);
+      return res.json(resultados || []);
+    });
+  } catch (err) {
+    console.error('Error en getAllUserBusinesses:', err);
+    return res.status(500).json({ error: 'Error interno en getAllUserBusinesses: ' + err.message });
+  }
 }
 
+// NOTA: Esta ruta está duplicada. Hay otra idéntica más arriba en el código.
+// Se mantiene por ahora para evitar romper funcionalidad existente.
+app.get('/api/debug-token', authenticateToken, (req, res) => {
+  console.log('Contenido del token recibido:', req.user);
+  res.json({ 
+    message: 'Token válido',
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+      displayName: req.user.displayName,
+      provider: req.user.provider || 'local'
+    }
+  });
+});
+
+// Endpoint para obtener reseñas recientes
+app.get('/api/resenas/recientes', async (req, res) => {
+  try {
+      const limit = parseInt(req.query.limit) || 3;
+      
+      const query = `
+          SELECT 
+              r.*,
+              n.nombre as business_name,
+              n.id_Negocios as business_id,
+              f.url_foto as business_image,
+              COALESCE(u.display_name, 'Usuario anónimo') as nombre_usuario
+          FROM 
+              resenas r
+          JOIN 
+              negocios n ON r.id_Negocios = n.id_Negocios
+          LEFT JOIN 
+              fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+          LEFT JOIN 
+              users u ON r.id_Usuario = u.id
+          ORDER BY 
+              r.fecha_resena DESC
+          LIMIT ?
+      `;
+      
+      db.query(query, [limit], (err, results) => {
+          if (err) {
+              console.error('Error al obtener reseñas recientes:', err);
+              return res.status(500).json({ error: 'Error al obtener reseñas recientes' });
+          }
+          
+          // Procesar resultados y enviar respuesta
+          const resenasFormateadas = results.map(resena => {
+              // Asegurar que la imagen tenga una ruta válida
+              let imageSrc = resena.business_image || '/img/default-restaurant.jpg';
+              if (!imageSrc.startsWith('/') && !imageSrc.startsWith('http')) {
+                  imageSrc = '/' + imageSrc;
+              }
+              
+              return {
+                  ...resena,
+                  fecha_creacion: resena.fecha_resena,
+                  business_image: imageSrc,
+                  comentario: resena.comentario || 'Sin comentario'
+              };
+          });
+          
+          res.json(resenasFormateadas);
+      });
+  } catch (error) {
+      console.error('Error en endpoint de reseñas recientes:', error);
+      res.status(500).json({ 
+          error: 'Error al obtener reseñas recientes',
+          message: error.message
+      });
+  }
+});
 
 // Endpoint para filtrar negocios
 app.get('/api/negocios/filtro', (req, res) => {
@@ -575,9 +757,35 @@ app.get('/api/negocios/filtro', (req, res) => {
   }
 });
 
+// Obtener negocios (requiere autenticación)
+app.get('/api/negocios', authenticateToken, (req, res) => {
+  try {
+    console.log('GET /api/negocios - Usuario autenticado:', {
+      id: req.user.id,
+      email: req.user.email,
+      provider: req.user.provider
+    });
+    
+    if (!req.user || !req.user.id) {
+      console.error('Error: req.user o req.user.id no disponible');
+      return res.status(400).json({ error: 'Información de usuario incompleta en el token' });
+    }
+    
+    // Modificación para depuración: envía una respuesta directa si el usuario existe
+    console.log("ID de usuario válido:", req.user.id);
+    
+    // Llamar a getAllUserBusinesses con el ID de usuario
+    getAllUserBusinesses(req.user.id, res);
+  } catch (error) {
+    console.error("Error en ruta /api/negocios:", error);
+    res.status(500).json({ error: "Error en el servidor: " + error.message });
+  }
+});
 
-// CORREGIDO: Endpoint para negocios públicos
-// Añade o modifica la función que muestra los negocios en resenas.js
+// NOTA: Esta función es código del lado del cliente y no debería estar en el servidor.
+// Debería moverse a un archivo JavaScript del cliente, como /Resenas/cargar-resenas.js
+// Se mantiene comentada aquí como referencia hasta que se mueva al lugar correcto.
+/*
 function displayBusinesses(businesses) {
   const businessContainer = document.querySelector('.business-grid');
   
@@ -645,6 +853,7 @@ function displayBusinesses(businesses) {
       businessContainer.appendChild(businessCard);
   });
 }
+*/
 // Endpoint para negocios públicos (añade esto a tu server.js)
 app.get('/api/negocios/publicos', (req, res) => {
   console.log('Solicitud recibida para /api/negocios/publicos');

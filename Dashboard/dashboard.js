@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    let isLoadingBusinesses = false;
     // Verificar autenticación
     const token = localStorage.getItem('token');
     if (!token) {
@@ -6,7 +7,32 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/Login/Login.html';
         return;
     }
-    
+
+// Controlar visibilidad de enlaces de autenticación
+const loginLink = document.querySelector('a[href="/Login/Login.html"]') || document.getElementById('login');
+const cerrarSesionLink = document.getElementById('cerrar-sesion');
+
+// Si hay token, ocultar inicio de sesión y mostrar cerrar sesión
+if (token) {
+    if (loginLink) loginLink.style.display = 'none';
+    if (cerrarSesionLink) cerrarSesionLink.style.display = 'block';
+} else {
+    // Esto no debería ejecutarse en dashboard.js ya que redirigimos antes,
+    // pero lo incluimos por completitud
+    if (loginLink) loginLink.style.display = 'block';
+    if (cerrarSesionLink) cerrarSesionLink.style.display = 'none';
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+       
+       
+        // Limpiar caché local
+        localStorage.removeItem('cached_businesses');
+        sessionStorage.clear();
+        
+        // El resto de tu código de inicialización...
+      });
+
     // Configuración inicial
     const usuarioActual = document.getElementById('usuario-actual');
     const cerrarSesion = document.getElementById('cerrar-sesion');
@@ -569,7 +595,7 @@ if (btnConfirmarEliminar) {
     
     async function cargarDatosUsuario() {
         try {
-            const response = await fetch('http://localhost:3001/api/me', {
+            const response = await fetch('/api/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -608,48 +634,111 @@ if (btnConfirmarEliminar) {
     }
     
     async function cargarNegociosUsuario() {
+        // Variable para evitar cargas múltiples
+        if (isLoadingBusinesses) {
+            console.log('Ya se está ejecutando una carga de negocios, ignorando llamada duplicada');
+            return;
+        }
+        
+        isLoadingBusinesses = true;
+        
         try {
-            const response = await fetch('http://localhost:3001/api/negocios', {
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No hay token disponible');
+                const listaNegociosElement = document.getElementById('lista-negocios');
+                if (listaNegociosElement) {
+                    listaNegociosElement.innerHTML = `<div class="error-message">No hay sesión activa. Por favor inicia sesión.</div>`;
+                }
+                return;
+            }
+            
+            console.log('Recuperando negocios para el usuario actual...');
+            const response = await fetch('/api/negocios', {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    // Evitar caché
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
                 }
             });
             
             if (!response.ok) {
-                throw new Error('Error al obtener negocios');
+                let errorMsg = 'Error al obtener negocios';
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.error || errorMsg;
+                } catch (e) {}
+                
+                throw new Error(errorMsg);
             }
             
             const allNegocios = await response.json();
+            console.log('Negocios recuperados:', allNegocios.length);
             
-            // Filtrar negocios del usuario actual (esto requiere modificación en el backend para incluir id_usuario en negocios)
-            // Por ahora, asumimos que todos los negocios son del usuario
+            // Asignamos todos los negocios recibidos
             negociosData = allNegocios;
             
-            // Renderizar negocios
-            renderizarNegocios(negociosData);
+            // Agregar depuración para ver los IDs
+            console.log('IDs de los negocios a renderizar:');
+            allNegocios.forEach(negocio => {
+                console.log(`ID: ${negocio.id_Negocios}, Nombre: ${negocio.nombre}`);
+            });
             
-            // Actualizar contador de estadísticas
-            document.getElementById('total-negocios').textContent = negociosData.length;
+            if (allNegocios.length > 0) {
+                console.log('Datos completos del primer negocio:', JSON.stringify(allNegocios[0], null, 2));
+            }
             
+            if (negociosData.length === 0) {
+                const listaNegociosElement = document.getElementById('lista-negocios');
+                if (listaNegociosElement) {
+                    listaNegociosElement.innerHTML = `<div class="no-data">No tienes negocios registrados. ¡Registra tu primer negocio!</div>`;
+                }
+            } else {
+                // Renderizar negocios con la función mejorada
+                renderizarNegocios(negociosData);
+                
+                // Actualizar contador de estadísticas
+                const totalElement = document.getElementById('total-negocios');
+                if (totalElement) {
+                    totalElement.textContent = negociosData.length;
+                }
+            }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error al cargar negocios:', error);
             const listaNegociosElement = document.getElementById('lista-negocios');
-            listaNegociosElement.innerHTML = `<div class="error-message">Error al cargar negocios: ${error.message}</div>`;
+            if (listaNegociosElement) {
+                listaNegociosElement.innerHTML = `
+                    <div class="error-message">Error al cargar negocios: ${error.message}</div>
+                `;
+            }
+        } finally {
+            isLoadingBusinesses = false;
         }
     }
     
-    function renderizarNegocios(negocios) {
+      function renderizarNegocios(negocios) {
         const listaNegociosElement = document.getElementById('lista-negocios');
         
         if (!negocios || negocios.length === 0) {
-            listaNegociosElement.innerHTML = `
-                <div class="no-negocios">
-                    <p>No tienes negocios registrados aún.</p>
-                    <a href="registrar-negocio.html" class="btn-primary">Registrar Primer Negocio</a>
-                </div>
-            `;
-            return;
+          // Código existente para cuando no hay negocios...
+          return;
         }
+        
+        // Eliminar duplicados basados en id_Negocios
+        const negociosUnicos = {};
+        negocios.forEach(negocio => {
+          if (!negociosUnicos[negocio.id_Negocios]) {
+            negociosUnicos[negocio.id_Negocios] = negocio;
+          }
+        });
+        
+        // Convertir de objeto a array
+        const negociosFiltrados = Object.values(negociosUnicos);
+        console.log(`Mostrando ${negociosFiltrados.length} negocios únicos`);
+        
         
         let html = '';
         

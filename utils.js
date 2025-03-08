@@ -20,24 +20,80 @@ if (typeof window.Utils === 'undefined') {
         // Función para reintentar peticiones fallidas
         async fetchWithRetry(url, options = {}, maxRetries = 3) {
             let retries = 0;
+            let lastError;
             
             while (retries < maxRetries) {
                 try {
-                    return await fetch(url, options);
+                    const response = await fetch(url, options);
+                    
+                    // Si la respuesta no es exitosa, lanza un error con el mensaje del servidor
+                    if (!response.ok) {
+                        let errorMessage = `Error HTTP: ${response.status}`;
+                        
+                        try {
+                            // Intentar leer el mensaje de error del servidor
+                            const errorData = await response.json();
+                            if (errorData.error) {
+                                errorMessage = errorData.error;
+                            }
+                        } catch (parseError) {
+                            // Si no se puede parsear como JSON, ignorar este error
+                        }
+                        
+                        throw new Error(errorMessage);
+                    }
+                    
+                    return response;
                 } catch (error) {
                     retries++;
+                    lastError = error;
                     console.warn(`Intento ${retries}/${maxRetries} fallido para ${url}:`, error);
                     
                     if (retries >= maxRetries || !this.isNetworkError(error)) {
-                        throw error;
+                        break;
                     }
                     
-                    // Esperar antes de reintentar (backoff exponencial)
-                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retries - 1)));
+                    // Backoff exponencial
+                    const delay = Math.min(1000 * Math.pow(2, retries - 1), 10000);
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
+            
+            // Si llegamos aquí, es porque se agotaron los intentos
+            console.error('Se agotaron los intentos de conexión:', lastError);
+            
+            // Mostrar notificación si estamos en un navegador
+            if (typeof document !== 'undefined' && document.body) {
+                this.showNotification('Error de conexión. Por favor, intenta de nuevo más tarde.', 'error');
+            }
+            
+            throw lastError;
         },
         
+        // Manejar errores de autenticación
+        handleAuthError(error, redirectToLogin = true) {
+            if (error.message && (
+                error.message.includes('TOKEN_EXPIRED') || 
+                error.message.includes('Token expirado') || 
+                error.message.includes('401')
+            )) {
+                // Limpiar token y datos de usuario
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                
+                // Mostrar notificación
+                this.showNotification('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.', 'error');
+                
+                if (redirectToLogin) {
+                    // Redireccionar después de un pequeño retraso
+                    setTimeout(() => {
+                        window.location.href = '/Login/Login.html';
+                    }, 2000);
+                }
+                return true;
+            }
+            return false;
+        },
         // Formatear URL de imagen para asegurar validez
         formatImageUrl(url) {
             if (!url || url === '') {
