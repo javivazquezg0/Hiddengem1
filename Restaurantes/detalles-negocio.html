@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle del Negocio - HiddenGem6</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/notifications.css">
     <link rel="stylesheet" href="../Nav-Bar/nav-bar.css">
 
     <link rel="icon" href="../img/Logo">
@@ -438,6 +439,24 @@
     <div class="business-detail-container" id="business-detail-container">
         <!-- Aquí se mostrará el contenido del negocio -->
         <div class="loading-container">
+            <!-- Añadir este código después de la línea que tiene class="loading-container" -->
+<div id="fallback-controls" style="display: none; text-align: center; margin-top: 20px;">
+    <p>Parece que estamos teniendo problemas para cargar los datos del servidor.</p>
+    <button onclick="loadSampleBusinesses()" class="btn-primary" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+        Cargar datos de ejemplo
+    </button>
+</div>
+
+<script>
+    // Mostrar controles de fallback después de 5 segundos si sigue cargando
+    setTimeout(() => {
+        const loading = document.querySelector('.loading-container');
+        const fallback = document.getElementById('fallback-controls');
+        if (loading && fallback) {
+            fallback.style.display = 'block';
+        }
+    }, 5000);
+</script>
             <div class="loading-spinner"></div>
         </div>
     </div>
@@ -525,20 +544,29 @@
         }
         
         // Cargar detalle del negocio
-        async function loadBusinessDetail(id) {
-            try {
-                const container = document.getElementById('business-detail-container');
-                
-                // Mostrar loading
-                container.innerHTML = `
-                    <div class="loading-container">
-                        <div class="loading-spinner"></div>
-                    </div>
-                `;
-                
+async function loadBusinesses() {
+    try {
+        const cardContainer = document.getElementById('card-container');
+        
+        // Mostrar loading
+        if (cardContainer) {
+            cardContainer.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div id="fallback-controls" style="text-align: center; margin-top: 20px;">
+                    <p>Si los datos no cargan, puedes usar datos de muestra.</p>
+                    <button onclick="loadSampleBusinesses()" class="btn-primary" style="background-color: #ff6600; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                        Cargar datos de muestra
+                    </button>
+                </div>
+            `;
+        }
+        
+        console.log("Intentando cargar datos del servidor...");
+        
                 // Obtener detalle del negocio
-                const response = await fetch(`http://localhost:3001/api/negocios/${id}`);
-                
+                const response = await fetch('/api/negocios/publicos');                
                 if (!response.ok) {
                     throw new Error('Error al cargar el detalle del negocio');
                 }
@@ -560,7 +588,7 @@
         // Cargar reseñas del negocio
         async function loadReviews(businessId) {
             try {
-                const response = await fetch(`http://localhost:3001/api/negocios/${businessId}/resenas`);
+                const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/${businessId}/resenas`);
                 
                 if (!response.ok) {
                     throw new Error('Error al cargar las reseñas');
@@ -749,7 +777,7 @@
             
             try {
                 // Enviar reseña al servidor
-                const response = await fetch(`http://localhost:3001/api/negocios/${businessId}/resenas`, {
+                const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/${businessId}/resenas`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

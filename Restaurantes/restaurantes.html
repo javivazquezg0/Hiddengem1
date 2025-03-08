@@ -4,245 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurantes - HiddenGem6</title>
-    <!-- Ajuste de rutas relativas -->
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/notifications.css">
     <link rel="stylesheet" href="../Nav-Bar/nav-bar.css">
     <link rel="icon" href="../img/Logo">
-
-    <!-- Font Awesome para íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <!-- Mismo estilo CSS que antes -->
-    <style>
-        /* Estilos específicos para la página de restaurantes - Igual que antes */
-        .page-header {
-            text-align: center;
-            padding: 2rem 0;
-            background-color: #f8f9fa;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .page-header h1 {
-            font-size: 2.5rem;
-            margin: 0;
-            color: #333;
-        }
-        
-        .restaurants-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .filters-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .filters-bar select {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-        
-        .search-bar {
-            display: flex;
-            flex: 1;
-            max-width: 500px;
-            margin-right: 1rem;
-        }
-        
-        .search-bar input {
-            flex: 1;
-            padding: 0.6rem;
-            border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
-        }
-        
-        .search-bar button {
-            padding: 0.6rem 1rem;
-            background-color: #ff6600;
-            color: white;
-            border: none;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-        }
-        
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        
-        .card {
-            width: 280px;
-            border: none;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            background-color: white;
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
-        
-        .card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-        
-        .card-body {
-            padding: 16px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        
-        .card-stars {
-            color: gold;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-        
-        .card-stars i {
-            margin-right: 2px;
-        }
-        
-        .card-details {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .card-details i {
-            margin-right: 8px;
-        }
-        
-        .open-status {
-            color: #4CAF50;
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin-top: 8px;
-        }
-        
-        .category-tag {
-            display: inline-block;
-            padding: 3px 8px;
-            background-color: #f8f9fa;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: #666;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-        
-        .pagination button {
-            padding: 0.5rem 1rem;
-            margin: 0 0.25rem;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .pagination button.active {
-            background-color: #ff6600;
-            color: white;
-            border-color: #ff6600;
-        }
-        
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            width: 100%;
-        }
-        
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #ff6600;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            width: 100%;
-            color: #666;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .card {
-                width: calc(33.333% - 20px);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .filters-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .search-bar {
-                width: 100%;
-                max-width: none;
-                margin-bottom: 1rem;
-                margin-right: 0;
-            }
-            
-            .card {
-                width: calc(50% - 15px);
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .card {
-                width: 100%;
-            }
-        }
-    </style>
+    <script src="../utils.js"></script>
 </head>
 <body>
     <!--Nav-var-->
@@ -271,42 +38,42 @@
                         <span>Inicia sesi&oacute;n</span>
                     </a>
                 </li>
-            <li>
-                <a href="../Registro/registrar-negocio.html">
-                    <ion-icon name="pin-outline"></ion-icon>
-                    <span>¡Registra tu negocio!</span>
-                </a>
-            </li>
-            <li>
-                <a href="../Restaurantes/restaurantes.html">
-                    <ion-icon name="star-half-outline"></ion-icon>
-                    <span>Restaurantes</span>
-                </a>
-            </li>
-            <li>
-                <a href="../Dashboard/dashboard.html">
-                    <ion-icon name="desktop-outline"></ion-icon>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <ion-icon name="storefront-outline"></ion-icon>
-                    <span>puestos</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <ion-icon name="rocket-outline"></ion-icon>
-                    <span>¿quienes somos?</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" id="cerrar-sesion">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                    <span>Cerrar sesión</span>
-                </a>
-            </li>
+                <li>
+                    <a href="../Registro/registrar-negocio.html">
+                        <ion-icon name="pin-outline"></ion-icon>
+                        <span>¡Registra tu negocio!</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Restaurantes/restaurantes.html">
+                        <ion-icon name="star-half-outline"></ion-icon>
+                        <span>Restaurantes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Dashboard/dashboard.html">
+                        <ion-icon name="desktop-outline"></ion-icon>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <ion-icon name="storefront-outline"></ion-icon>
+                        <span>Puestos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <ion-icon name="rocket-outline"></ion-icon>
+                        <span>¿quienes somos?</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="cerrar-sesion">
+                        <ion-icon name="log-out-outline"></ion-icon>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
             </ul>
         </nav>
         <div>
@@ -363,447 +130,636 @@
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="footer-content">
+    <footer class="site-footer">
+        <div class="footer-container">
             <div class="footer-section">
-                <h3>Acerca de Hiddengem6</h3>
-                <p>Descubre los tesoros ocultos en tu ciudad. Desde restaurantes locales hasta experiencias únicas, te ayudamos a encontrar lo mejor que tu comunidad tiene para ofrecer.</p>
+                <h3>Acerca de Juarnachaz</h3>
+                <p>Descubre los tesoros culinarios en tu ciudad. Desde restaurantes locales hasta experiencias gastronómicas únicas, te ayudamos a encontrar lo mejor que tu comunidad tiene para ofrecer.</p>
             </div>
             <div class="footer-section">
                 <h3>Enlaces rápidos</h3>
-                <ul>
-                    <!-- Corregir rutas de navegación en el footer -->
-                    <li><a href="../index.html">Inicio</a></li>
-                    <li><a href="restaurantes.html">Restaurantes</a></li>
-                    <li><a href="destacados.html">Destacados</a></li>
-                    <li><a href="blog.html">Blog</a></li>
+                <ul class="footer-links">
+                    <li><a href="/index.html"><ion-icon name="home-outline"></ion-icon> Inicio</a></li>
+                    <li><a href="../Restaurantes/restaurantes.html"><ion-icon name="star-half-outline"></ion-icon> Restaurantes</a></li>
+                    <li><a href="../Registro/registrar-negocio.html"><ion-icon name="pin-outline"></ion-icon> Registra tu negocio</a></li>
+                    <li><a href="../Dashboard/dashboard.html"><ion-icon name="desktop-outline"></ion-icon> Dashboard</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Contacto</h3>
-                <p><i class="fas fa-envelope"></i> info@hiddengem6.com</p>
-                <p><i class="fas fa-phone"></i> (123) 456-7890</p>
+                <p><ion-icon name="mail-outline"></ion-icon> info@juarnachaz.com</p>
+                <p><ion-icon name="call-outline"></ion-icon> (123) 456-7890</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><ion-icon name="logo-facebook"></ion-icon></a>
+                    <a href="#" aria-label="Twitter"><ion-icon name="logo-twitter"></ion-icon></a>
+                    <a href="#" aria-label="Instagram"><ion-icon name="logo-instagram"></ion-icon></a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Hiddengem6. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Juarnachaz. Todos los derechos reservados.</p>
         </div>
     </footer>
 
     <script>
-        // Variables para la paginación
-        let currentPage = 1;
-        let itemsPerPage = 9;
-        let allBusinesses = [];
-        let filteredBusinesses = [];
+// Las variables globales y los elementos DOM se declaran al inicio
+const searchInput = document.getElementById('search-restaurant');
+const searchButton = document.getElementById('search-button');
+const filterCategory = document.getElementById('filter-category');
+const filterRating = document.getElementById('filter-rating');
+
+// Variables globales (solo una vez)
+let currentPage = 1;
+let itemsPerPage = 9;
+let allBusinesses = [];
+let filteredBusinesses = [];
+let searchTimeout;
+
+// Inicialización al cargar el documento (solo una vez)
+document.addEventListener('DOMContentLoaded', function() {
+    console.clear();
+    console.log("🚀 Inicializando página de restaurantes...");
+    
+    // Verificar los elementos DOM críticos
+    if (!searchInput) console.warn("⚠️ Elemento #search-restaurant no encontrado");
+    if (!filterCategory) console.warn("⚠️ Elemento #filter-category no encontrado");
+    if (!filterRating) console.warn("⚠️ Elemento #filter-rating no encontrado");
+    
+    // Cargar datos iniciales y verificar usuario
+    checkUserLogin();
+    loadBusinesses();
+    
+    // Configurar event listeners para filtrado
+    setupFilterListeners();
+    
+    // Agregar logging adicional
+    console.log("🔍 Elementos DOM encontrados:", {
+        searchInput: !!searchInput,
+        searchButton: !!searchButton,
+        filterCategory: !!filterCategory,
+        filterRating: !!filterRating
+    });
+});
+
+// Función para verificar si el usuario está logueado
+function checkUserLogin() {
+    console.log("Verificando estado de login...");
+    const token = localStorage.getItem('token');
+    const loginLink = document.querySelector('a[href="/Login/Login.html"]');
+    const cerrarSesionLink = document.getElementById('cerrar-sesion');
+    
+    if (token) {
+        console.log("Usuario logueado encontrado");
+        if (loginLink) loginLink.style.display = 'none';
+        if (cerrarSesionLink) cerrarSesionLink.style.display = 'block';
+    } else {
+        console.log("Usuario no logueado");
+        if (loginLink) loginLink.style.display = 'block';
+        if (cerrarSesionLink) cerrarSesionLink.style.display = 'none';
+    }
+}
+
+// Configuración de event listeners para filtrado
+function setupFilterListeners() {
+    console.log("Configurando event listeners...");
+    
+    if (searchInput) {
+        // Limpiar event listeners existentes 
+        searchInput.removeEventListener('input', handleSearchInput);
         
-        // Verificar si el usuario está logueado
-        document.addEventListener('DOMContentLoaded', () => {
-            checkUserLogin();
-            
-            // Cargar los negocios
-            loadBusinesses();
+        // Añadir nuevo listener para input con debounce
+        searchInput.addEventListener('input', handleSearchInput);
+        
+        // Añadir listener para Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimeout);
+                applyFiltersWithAPI();
+            }
         });
-
-        // Función para verificar si el usuario está logueado
-        function checkUserLogin() {
-            const token = localStorage.getItem('token');
-            const loginLink = document.querySelector('a[href="../Login/Login.html"]');
-            const miCuentaLink = document.getElementById('mi-cuenta-link');
-            
-            if (token) {
-                // Usuario logueado
-                if (loginLink) loginLink.style.display = 'none';
-                if (miCuentaLink) miCuentaLink.style.display = 'inline-block';
-            } else {
-                // Usuario no logueado
-                if (loginLink) loginLink.style.display = 'inline-block';
-                if (miCuentaLink) miCuentaLink.style.display = 'none';
-            }
-        }
-
-        // Funcionalidad para el menú móvil
-        const burger = document.querySelector('.burger');
-        const navLinks = document.querySelector('.nav-links');
         
-        if (burger) {
-            burger.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                burger.classList.toggle('active');
+        console.log("✅ Event listeners configurados para searchInput");
+    }
+
+    if (searchButton) {
+        // Limpiar listener existente
+        searchButton.replaceWith(searchButton.cloneNode(true));
+        // Re-obtener el botón después de clonarlo
+        const newSearchButton = document.getElementById('search-button');
+        
+        // Usar la API al hacer clic en el botón de búsqueda
+        if (newSearchButton) {
+            newSearchButton.addEventListener('click', function() {
+                clearTimeout(searchTimeout);
+                applyFiltersWithAPI();
             });
+            console.log("✅ Event listener configurado para searchButton");
         }
+    }
 
-        // Función para cargar los negocios desde el servidor
-        async function loadBusinesses() {
-            try {
-                const cardContainer = document.getElementById('card-container');
-                
-                // Mostrar loading
-                cardContainer.innerHTML = `
-                    <div class="loading-container">
-                        <div class="loading-spinner"></div>
-                    </div>
-                `;
-                
-                // Obtener los negocios del servidor
-                const response = await fetch('http://localhost:3001/api/negocios/publicos');
-                
-                if (!response.ok) {
-                    throw new Error('Error al cargar los negocios');
-                }
-                
-                const data = await response.json();
-                console.log('Datos recibidos del servidor:', data);
-                
-                // Asegurarse de que los datos estén en el formato correcto
-                allBusinesses = Array.isArray(data) ? data : [];
-                filteredBusinesses = [...allBusinesses];
-                
-                // Verificar si tenemos negocios
-                if (allBusinesses.length === 0) {
-                    console.warn('No se encontraron negocios en la respuesta de la API');
-                    // Cargar datos de ejemplo como fallback
-                    loadSampleBusinesses();
-                    return;
-                }
-                
-                // Cargar categorías únicas para el filtro
-                loadCategories();
-                
-                // Mostrar los negocios
-                displayBusinesses();
-                
-            } catch (error) {
-                console.error('Error al cargar los negocios:', error);
-                
-                // Si hay un error o no hay conexión, cargar datos de ejemplo para desarrollo
-                loadSampleBusinesses();
-            }
+    if (filterCategory) {
+        // Usar la API al cambiar la categoría
+        filterCategory.addEventListener('change', applyFiltersWithAPI);
+        console.log("✅ Event listener configurado para filterCategory");
+    }
+
+    if (filterRating) {
+        // Usar la API al cambiar la calificación
+        filterRating.addEventListener('change', applyFiltersWithAPI);
+        console.log("✅ Event listener configurado para filterRating");
+    }
+}
+
+// Función manejadora para el evento input con debounce
+function handleSearchInput() {
+    console.log("📝 Texto ingresado:", this.value);
+    
+    // Cancelar cualquier timeout anterior
+    clearTimeout(searchTimeout);
+    
+    // Aplicar filtros después de 500ms sin escribir
+    searchTimeout = setTimeout(() => {
+        applyFiltersWithAPI();
+    }, 500);
+}
+
+// Función para aplicar filtros usando la API
+async function applyFiltersWithAPI() {
+    try {
+        const cardContainer = document.getElementById('card-container');
+        
+        // Mostrar indicador de carga
+        if (cardContainer) {
+            cardContainer.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
         }
         
-        // Función para cargar datos de ejemplo (para desarrollo)
-        function loadSampleBusinesses() {
-            console.log('Cargando datos de muestra...');
-            // Datos de muestra (igual que antes)
-            allBusinesses = [
-                {
-                    id_Negocios: 1,
-                    nombre: "Pizzeria la Yemi",
-                    descripcion: "Las mejores pizzas de la ciudad",
-                    categoria: "Pizza",
-                    calle: "Av. Constitución",
-                    numero_exterior: "123",
-                    colonia: "Centro",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "../img/PIZZA.jpg",
-                    promedio_calificaciones: 4.5,
-                    total_resenas: 28,
-                    horario_cierre: "22:30"
-                },
-                {
-                    id_Negocios: 2,
-                    nombre: "Taqueria Javi",
-                    descripcion: "Tacos tradicionales",
-                    categoria: "Tacos",
-                    calle: "Calle Juárez",
-                    numero_exterior: "456",
-                    colonia: "Reforma",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "../img/TACOS.jpg",
-                    promedio_calificaciones: 4.2,
-                    total_resenas: 45,
-                    horario_cierre: "22:00"
-                },
-                {
-                    id_Negocios: 3,
-                    nombre: "Birria Don Juan",
-                    descripcion: "La mejor birria de la zona",
-                    categoria: "Birria",
-                    calle: "Av. Insurgentes",
-                    numero_exterior: "789",
-                    colonia: "Del Valle",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "../img/Birria1.jpg",
-                    promedio_calificaciones: 4.7,
-                    total_resenas: 36,
-                    horario_cierre: "22:00"
-                },
-                {
-                    id_Negocios: 4,
-                    nombre: "El Pozolero",
-                    descripcion: "Pozole tradicional mexicano",
-                    categoria: "Pozole",
-                    calle: "Calle Hidalgo",
-                    numero_exterior: "321",
-                    colonia: "Centro",
-                    municipio: "Ciudad",
-                    estado: "Estado",
-                    foto_portada: "../img/posole.jpg",
-                    promedio_calificaciones: 4.0,
-                    total_resenas: 22,
-                    horario_cierre: "20:00"
-                }
-            ];
-            
-            filteredBusinesses = [...allBusinesses];
-            
-            // Cargar categorías únicas para el filtro
-            loadCategories();
-            
-            // Mostrar los negocios
-            displayBusinesses();
+        // Obtener valores de los filtros
+        const searchTerm = searchInput ? searchInput.value.trim() : '';
+        const categoryFilter = filterCategory ? filterCategory.value : '';
+        const ratingFilter = filterRating ? filterRating.value : '';
+        
+        console.log("🔍 Filtrando con API:", { searchTerm, categoryFilter, ratingFilter });
+        
+        // Construir URL con parámetros de consulta
+        let url = 'http://localhost:3001/api/negocios/filtro?';
+        
+        if (searchTerm) url += `q=${encodeURIComponent(searchTerm)}&`;
+        if (categoryFilter) url += `categoria=${encodeURIComponent(categoryFilter)}&`;
+        if (ratingFilter) url += `calificacion=${encodeURIComponent(ratingFilter)}&`;
+        
+        // Eliminar el último '&' si existe
+        url = url.endsWith('&') ? url.slice(0, -1) : url;
+        
+        console.log("URL de la API:", url);
+        
+        // Hacer petición a la API
+        const response = await fetch(url);
+        console.log("Respuesta recibida:", response.status, response.statusText);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
         }
         
-        // Cargar categorías únicas para el filtro
-        function loadCategories() {
-            const filterCategory = document.getElementById('filter-category');
-            
-            // Obtener categorías únicas
-            const categories = [...new Set(allBusinesses
-                .filter(business => business.categoria) // Filtrar solo negocios con categoría definida
-                .map(business => business.categoria))];
-            
-            // Crear opciones del select
-            let categoryOptions = '<option value="">Todas las categorías</option>';
-            
-            categories.forEach(category => {
-                categoryOptions += `<option value="${category}">${category}</option>`;
-            });
-            
-            // Agregar opciones al select
-            filterCategory.innerHTML = categoryOptions;
-        }
-
-        // Mostrar los negocios con paginación
-        function displayBusinesses() {
+        // Guardar los resultados filtrados
+        const data = await response.json();
+        console.log("Datos recibidos:", data);
+        
+        filteredBusinesses = data;
+        console.log("🧮 Negocios filtrados recibidos:", filteredBusinesses.length);
+        
+        // Resetear a la primera página
+        currentPage = 1;
+        
+        // Mostrar negocios filtrados
+        displayBusinesses();
+        
+    } catch (error) {
+        console.error("❌ Error al filtrar con API:", error);
+        
+        // En caso de error, intentar usar datos locales como fallback
+        if (allBusinesses && allBusinesses.length > 0) {
+            console.log("⚠️ Usando filtrado local como fallback");
+            applyFiltersLocally();
+        } else {
+            // Mostrar mensaje de error
             const cardContainer = document.getElementById('card-container');
-            const paginationContainer = document.getElementById('pagination');
-            
-            // Calcular índices de inicio y fin para la página actual
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            
-            // Obtener los negocios para la página actual
-            const businessesForCurrentPage = filteredBusinesses.slice(startIndex, endIndex);
-            
-            // Verificar si hay negocios para mostrar
-            if (businessesForCurrentPage.length === 0) {
+            if (cardContainer) {
                 cardContainer.innerHTML = `
                     <div class="no-results">
-                        <i class="fas fa-search" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
-                        <h3>No se encontraron negocios</h3>
-                        <p>Intenta con otra búsqueda o filtro</p>
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                        <h3>Error al cargar datos</h3>
+                        <p>No se pudieron filtrar los restaurantes. Inténtalo de nuevo más tarde.</p>
                     </div>
                 `;
-                paginationContainer.innerHTML = '';
-                return;
+            }
+        }
+    }
+}
+
+// Función para filtrado local (fallback)
+function applyFiltersLocally() {
+    // Obtener valores de los filtros
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const categoryFilter = filterCategory ? filterCategory.value : '';
+    const ratingFilter = filterRating ? parseFloat(filterRating.value) : 0;
+    
+    console.log("🔍 Aplicando filtros localmente:", { 
+        searchTerm, 
+        categoryFilter, 
+        ratingFilter
+    });
+    
+    // Asegurarse de que allBusinesses exista y tenga datos
+    if (!allBusinesses || allBusinesses.length === 0) {
+        console.warn("⚠️ No hay datos de negocios para filtrar");
+        return;
+    }
+    
+    // Filtrar negocios localmente
+    filteredBusinesses = allBusinesses.filter(business => {
+        // Verificar que el negocio tenga datos válidos
+        if (!business) return false;
+        
+        // Filtro por texto de búsqueda
+        let matchesSearch = true;
+        
+        if (searchTerm !== '') {
+            // Crear un array con todos los campos relevantes para buscar
+            const fieldsToSearch = [
+                business.nombre || '',
+                business.descripcion || '',
+                business.categoria || '',
+                business.calle || '',
+                business.colonia || '',
+                business.municipio || '',
+                business.estado || ''
+            ];
+            
+            // Verificar si algún campo contiene el término de búsqueda
+            matchesSearch = fieldsToSearch.some(field => 
+                field.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        // Filtro por categoría
+        const matchesCategory = categoryFilter === '' || 
+            (business.categoria && business.categoria === categoryFilter);
+        
+        // Filtro por calificación
+        const rating = business.promedio_calificaciones ? 
+            (typeof business.promedio_calificaciones === 'number' ? 
+                business.promedio_calificaciones : 
+                parseFloat(business.promedio_calificaciones) || 0) : 0;
+        
+        const matchesRating = ratingFilter === 0 || rating >= ratingFilter;
+        
+        // Debe cumplir todos los filtros activos
+        return matchesSearch && matchesCategory && matchesRating;
+    });
+    
+    console.log("🧮 Negocios filtrados localmente:", filteredBusinesses.length);
+    
+    // Resetear a la primera página
+    currentPage = 1;
+    
+    // Mostrar negocios filtrados
+    displayBusinesses();
+}
+
+// Cargar los negocios iniciales
+async function loadBusinesses() {
+    try {
+        const cardContainer = document.getElementById('card-container');
+        
+        // Mostrar loading
+        if (cardContainer) {
+            cardContainer.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
+        }
+        
+        console.log("Intentando cargar datos del servidor...");
+
+        // Intentar hacer una solicitud a la API
+        try {
+            // Añadir timestamp para evitar caché
+            const timestamp = new Date().getTime();
+            const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/publicos?t=${timestamp}`);
+            console.log("Respuesta del servidor:", response.status, response.statusText);
+            
+            if (!response.ok) {
+                console.warn("La respuesta del servidor no fue OK, usando datos de muestra");
+                throw new Error(`Error HTTP: ${response.status}`);
             }
             
-            // Generar HTML para las tarjetas
-            let cardsHTML = '';
+            const data = await response.json();
+            console.log("Datos recibidos:", data);
             
-            businessesForCurrentPage.forEach(business => {
-                // Verificar que el negocio tenga datos válidos
-                if (!business) return;
-                
-                // Generar dirección completa
-                const direccion = `${business.calle || ''} ${business.numero_exterior || ''}, ${business.colonia || ''}`;
-                
-                // Imagen por defecto si no hay portada
-                let imagenSrc = business.imagen;
-                if (!imagenSrc || imagenSrc === '') {
-                    imagenSrc = '/img/default-restaurant.jpg'; // Sin el "../"
-                }
-                // Verificar si la calificación está definida
-                const rating = business.promedio_calificaciones ? 
-                    (typeof business.promedio_calificaciones === 'number' ? 
-                        business.promedio_calificaciones : 
-                        parseFloat(business.promedio_calificaciones) || 0) : 0;
-                
-                cardsHTML += `
-                    <div class="card" onclick="goToBusinessDetail(${business.id_Negocios})">
-                    <img src="${imagenSrc}" alt="${business.nombre}" onerror="this.src='/img/default-restaurant.jpg'">
-                            <h3 class="card-title">${business.nombre || 'Restaurante'}</h3>
-                            <div class="card-stars">${generateStars(rating)}</div>
-                            <div class="card-details">
-                                <i class="fas fa-utensils"></i> ${business.categoria || 'Restaurante'}
-                            </div>
-                            <div class="card-details">
-                                <i class="fas fa-map-marker-alt"></i> ${direccion}
-                            </div>
-                            <span class="category-tag">${business.categoria || 'Restaurante'}</span>
-                            <p class="open-status"><i class="fas fa-clock"></i> Abierto hasta las ${business.horario_cierre || '21:00'}</p>
-                        </div>
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                console.warn("No hay datos en la respuesta, usando datos de muestra");
+                throw new Error("No hay datos");
+            }
+            
+            // Guardar y mostrar datos
+            allBusinesses = data;
+            filteredBusinesses = [...allBusinesses];
+            
+            loadCategories();
+            displayBusinesses();
+        } catch (apiError) {
+            console.error("Error en solicitud a API:", apiError);
+            console.log("Cargando datos de muestra como fallback");
+            loadSampleBusinesses();
+        }
+    } catch (error) {
+        console.error("Error general en loadBusinesses:", error);
+        loadSampleBusinesses();
+    }
+}
+
+// Cargar datos de ejemplo para desarrollo
+function loadSampleBusinesses() {
+    console.log('📋 Cargando datos de muestra');
+    
+    allBusinesses = [
+        {
+            id_Negocios: 1,
+            nombre: "Pizzeria la Yemi",
+            descripcion: "Las mejores pizzas de la ciudad",
+            categoria: "Pizza",
+            calle: "Av. Constitución",
+            numero_exterior: "123",
+            colonia: "Centro",
+            municipio: "Ciudad",
+            estado: "Estado",
+            foto_portada: "../img/PIZZA.jpg",
+            promedio_calificaciones: 4.5,
+            total_resenas: 28,
+            horario_cierre: "22:30"
+        },
+        {
+            id_Negocios: 2,
+            nombre: "Taqueria Javi",
+            descripcion: "Tacos tradicionales",
+            categoria: "Tacos",
+            calle: "Calle Juárez",
+            numero_exterior: "456",
+            colonia: "Reforma",
+            municipio: "Ciudad",
+            estado: "Estado",
+            foto_portada: "../img/TACOS.jpg",
+            promedio_calificaciones: 4.2,
+            total_resenas: 45,
+            horario_cierre: "22:00"
+        },
+        {
+            id_Negocios: 3,
+            nombre: "Café Nuevo",
+            descripcion: "Café de especialidad",
+            categoria: "Café",
+            calle: "Av. Reforma",
+            numero_exterior: "789",
+            colonia: "Del Valle",
+            municipio: "Ciudad",
+            estado: "Estado",
+            foto_portada: "../img/cafe.jpg",
+            promedio_calificaciones: 4.7,
+            total_resenas: 36,
+            horario_cierre: "22:00"
+        },
+        {
+            id_Negocios: 4,
+            nombre: "El Pozolero",
+            descripcion: "Pozole tradicional mexicano",
+            categoria: "Pozole",
+            calle: "Calle Hidalgo",
+            numero_exterior: "321",
+            colonia: "Centro",
+            municipio: "Ciudad",
+            estado: "Estado",
+            foto_portada: "../img/posole.jpg",
+            promedio_calificaciones: 4.0,
+            total_resenas: 22,
+            horario_cierre: "20:00"
+        }
+    ];
+    
+    filteredBusinesses = [...allBusinesses];
+    console.log("Datos de muestra cargados:", allBusinesses.length, "negocios");
+    
+    // Cargar categorías y mostrar negocios
+    loadCategories();
+    displayBusinesses();
+}   
+
+// Cargar categorías únicas para el filtro
+function loadCategories() {
+    if (!filterCategory) return;
+    
+    // Obtener categorías únicas
+    const categories = [...new Set(allBusinesses
+        .filter(business => business.categoria) 
+        .map(business => business.categoria))];
+    
+    console.log("🏷️ Categorías encontradas:", categories);
+    
+    // Crear opciones del select
+    let categoryOptions = '<option value="">Todas las categorías</option>';
+    
+    categories.forEach(category => {
+        categoryOptions += `<option value="${category}">${category}</option>`;
+    });
+    
+    // Agregar opciones al select
+    filterCategory.innerHTML = categoryOptions;
+}
+
+// Función para mostrar los negocios
+function displayBusinesses() {
+    const cardContainer = document.getElementById('card-container');
+    const paginationContainer = document.getElementById('pagination');
+    
+    if (!cardContainer) {
+        console.error("❌ Elemento #card-container no encontrado");
+        return;
+    }
+    
+    if (!paginationContainer) {
+        console.warn("⚠️ Elemento #pagination no encontrado");
+    }
+    
+    console.log("📊 Mostrando negocios:", {
+        totalFiltrados: filteredBusinesses.length,
+        paginaActual: currentPage,
+        negociosPorPagina: itemsPerPage
+    });
+    
+    // Calcular índices para la página actual
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    // Obtener los negocios para la página actual
+    const businessesForCurrentPage = filteredBusinesses.slice(startIndex, endIndex);
+    
+    console.log("📄 Negocios en página actual:", businessesForCurrentPage.length);
+    
+    // Verificar si hay negocios para mostrar
+    if (businessesForCurrentPage.length === 0) {
+        cardContainer.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-search" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                <h3>No se encontraron negocios</h3>
+                <p>Intenta con otra búsqueda o filtro</p>
+            </div>
+        `;
+        if (paginationContainer) paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    // Generar HTML para las tarjetas
+    let cardsHTML = '';
+    
+    businessesForCurrentPage.forEach(business => {
+        // Verificar que el negocio tenga datos válidos
+        if (!business) return;
+        
+        // Generar dirección completa
+        const direccion = business.direccion || 
+            `${business.calle || ''} ${business.numero_exterior || ''}, ${business.colonia || ''}`;
+        
+        // Manejo más robusto de la imagen
+        let imagenSrc = business.foto_portada || business.imagen;
+        if (!imagenSrc || imagenSrc === '') {
+            imagenSrc = '../img/default-restaurant.jpg';
+        } else if (!imagenSrc.startsWith('http') && !imagenSrc.startsWith('/') && !imagenSrc.startsWith('./') && !imagenSrc.startsWith('../')) {
+            imagenSrc = '../img/' + imagenSrc;
+        }
+        
+        // Verificar si la calificación está definida
+        const rating = business.promedio_calificaciones ? 
+            (typeof business.promedio_calificaciones === 'number' ? 
+                business.promedio_calificaciones : 
+                parseFloat(business.promedio_calificaciones) || 0) : 0;
+        
+        cardsHTML += `
+            <div class="card" onclick="goToBusinessDetail(${business.id_Negocios})">
+                <img src="${imagenSrc}" alt="${business.nombre}" onerror="this.src='../img/default-restaurant.jpg'">
+                <div class="card-body">
+                    <h3 class="card-title">${business.nombre || 'Restaurante'}</h3>
+                    <div class="card-stars">${generateStars(rating)}</div>
+                    <div class="card-details">
+                        <i class="fas fa-utensils"></i> ${business.categoria || 'Restaurante'}
                     </div>
-                `;
-            });
-            
-            // Actualizar el contenido del contenedor de tarjetas
-            cardContainer.innerHTML = cardsHTML;
-            
-            // Generar paginación
-            generatePagination();
-        }
-        
-        // Generar la paginación
-        function generatePagination() {
-            const paginationContainer = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredBusinesses.length / itemsPerPage);
-            
-            if (totalPages <= 1) {
-                paginationContainer.innerHTML = '';
-                return;
-            }
-            
-            let paginationHTML = `
-                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            `;
-            
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHTML += `
-                    <button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
-                        ${i}
-                    </button>
-                `;
-            }
-            
-            paginationHTML += `
-                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            `;
-            
-            paginationContainer.innerHTML = paginationHTML;
-        }
-        
-        // Cambiar de página
-        function changePage(page) {
-            const totalPages = Math.ceil(filteredBusinesses.length / itemsPerPage);
-            
-            if (page < 1 || page > totalPages) {
-                return;
-            }
-            
-            currentPage = page;
-            displayBusinesses();
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+                    <div class="card-details">
+                        <i class="fas fa-map-marker-alt"></i> ${direccion}
+                    </div>
+                    <span class="category-tag">${business.categoria || 'Restaurante'}</span>
+                    <p class="open-status"><i class="fas fa-clock"></i> Abierto hasta las ${business.horario_cierre || '21:00'}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    // Actualizar el contenido del contenedor de tarjetas
+    cardContainer.innerHTML = cardsHTML;
+    
+    // Generar paginación
+    generatePagination();
+}
 
-        // Función para ir al detalle del negocio
-        function goToBusinessDetail(businessId) {
-            window.location.href = `detalle-negocio.html?id=${businessId}`;
-        }
+// Generar la paginación
+function generatePagination() {
+    const paginationContainer = document.getElementById('pagination');
+    
+    if (!paginationContainer) return;
+    
+    const totalPages = Math.ceil(filteredBusinesses.length / itemsPerPage);
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    let paginationHTML = `
+        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    `;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+            <button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                ${i}
+            </button>
+        `;
+    }
+    
+    paginationHTML += `
+        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    `;
+    
+    paginationContainer.innerHTML = paginationHTML;
+}
 
-        // Generar estrellas basadas en la calificación
-        function generateStars(rating) {
-            // Asegurar que rating sea un número
-            rating = parseFloat(rating) || 0;
-            
-            // Limitar rating entre 0 y 5
-            rating = Math.max(0, Math.min(5, rating));
-            
-            const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 >= 0.5;
+// Cambiar de página
+function changePage(page) {
+    const totalPages = Math.ceil(filteredBusinesses.length / itemsPerPage);
+    
+    if (page < 1 || page > totalPages) {
+        return;
+    }
+    
+    currentPage = page;
+    displayBusinesses();
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-            let starsHTML = '';
+// Función para ir al detalle del negocio
+function goToBusinessDetail(businessId) {
+    window.location.href = `detalle-negocio.html?id=${businessId}`;
+}
 
-            for (let i = 0; i < fullStars; i++) {
-                starsHTML += '<i class="fas fa-star"></i>';
-            }
+// Generar estrellas basadas en la calificación
+function generateStars(rating) {
+    // Asegurar que rating sea un número
+    rating = parseFloat(rating) || 0;
+    
+    // Limitar rating entre 0 y 5
+    rating = Math.max(0, Math.min(5, rating));
+    
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
 
-            if (hasHalfStar) {
-                starsHTML += '<i class="fas fa-star-half-alt"></i>';
-            }
+    let starsHTML = '';
 
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-            for (let i = 0; i < emptyStars; i++) {
-                starsHTML += '<i class="far fa-star"></i>';
-            }
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fas fa-star"></i>';
+    }
 
-            return starsHTML;
-        }
+    if (hasHalfStar) {
+        starsHTML += '<i class="fas fa-star-half-alt"></i>';
+    }
 
-        // Filtro de búsqueda
-        const searchInput = document.getElementById('search-restaurant');
-        const searchButton = document.getElementById('search-button');
-        
-        if (searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    applyFilters();
-                }
-            });
-        }
-        
-        if (searchButton) {
-            searchButton.addEventListener('click', applyFilters);
-        }
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<i class="far fa-star"></i>';
+    }
 
-        // Filtros de categoría y calificación
-        const filterCategory = document.getElementById('filter-category');
-        const filterRating = document.getElementById('filter-rating');
-
-        if (filterCategory) {
-            filterCategory.addEventListener('change', applyFilters);
-        }
-
-        if (filterRating) {
-            filterRating.addEventListener('change', applyFilters);
-        }
-
-        // Función para aplicar filtros
-        function applyFilters() {
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            const categoryFilter = filterCategory ? filterCategory.value : '';
-            const ratingFilter = filterRating ? parseFloat(filterRating.value) : 0;
-            
-            filteredBusinesses = allBusinesses.filter(business => {
-                // Verificar que el negocio tenga datos válidos
-                if (!business) return false;
-                
-                // Filtro por texto
-                const matchesSearch = 
-                    (business.nombre && business.nombre.toLowerCase().includes(searchTerm)) || 
-                    (business.descripcion && business.descripcion.toLowerCase().includes(searchTerm)) ||
-                    (business.categoria && business.categoria.toLowerCase().includes(searchTerm));
-                
-                // Filtro por categoría
-                const matchesCategory = categoryFilter === '' || 
-                    (business.categoria && business.categoria === categoryFilter);
-                
-                // Filtro por calificación
-                const rating = business.promedio_calificaciones ? 
-                    (typeof business.promedio_calificaciones === 'number' ? 
-                        business.promedio_calificaciones : 
-                        parseFloat(business.promedio_calificaciones) || 0) : 0;
-                
-                const matchesRating = ratingFilter === 0 || rating >= ratingFilter;
-                
-                return matchesSearch && matchesCategory && matchesRating;
-            });
-            
-            // Resetear a la primera página
-            currentPage = 1;
-            
-            // Mostrar negocios filtrados
-            displayBusinesses();
-        }
-    </script>
-        <script type="module" src="/Nav-Bar/nav-bar.js"></script>
-
-       <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-       <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    return starsHTML;
+}
+</script>
+<script type="module" src="/Nav-Bar/nav-bar.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

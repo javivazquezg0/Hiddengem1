@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escribe una Reseña - Juarnachaz</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/notifications.css">
+    <link rel="stylesheet" href="../Nav-Bar/nav-bar.css">
+    <link rel="icon" href="../img/Logo">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="../utils.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .main-content {
+            margin-left: 60px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        
+        .barra-lateral.expandida ~ .main-content {
+            margin-left: 250px;
+        }
+        
+        .review-header {
+            background-color: #f8f8f8;
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        .review-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .review-header p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        .search-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0;
+            border: none;
+        }
+        
+        .search-input input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-location {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-left: 1px solid #e6e6e6;
+            border-right: 1px solid #e6e6e6;
+        }
+        
+        .search-location input {
+            padding: 15px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            width: 180px;
+        }
+        
+        .search-button {
+            background-color: #ff3d00;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-button:hover {
+            background-color: #e53600;
+        }
+        
+        .popular-businesses {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .popular-businesses h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .business-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .business-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .business-image {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .business-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .business-card:hover .business-image img {
+            transform: scale(1.05);
+        }
+        
+        .business-info {
+            padding: 15px;
+        }
+        
+        .business-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0 0 5px;
+            color: #333;
+        }
+        
+        .business-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .business-rating .stars {
+            color: #ff3d00;
+            margin-right: 8px;
+        }
+        
+        .business-rating .review-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .business-category {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .business-category i {
+            margin-right: 5px;
+        }
+        
+        .write-review-btn {
+            display: block;
+            background-color: #ff3d00;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .write-review-btn:hover {
+            background-color: #e53600;
+        }
+        
+        .recent-reviews {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .recent-reviews h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .review-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .review-card-header {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .reviewer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .reviewer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .reviewer-info {
+            flex: 1;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            margin: 0 0 5px;
+            color: #333;
+        }
+        
+        .review-date {
+            font-size: 0.9rem;
+            color: #999;
+        }
+        
+        .review-content {
+            margin-bottom: 15px;
+        }
+        
+        .review-business {
+            font-weight: 600;
+            margin: 0 0 10px;
+            color: #333;
+        }
+        
+        .review-stars {
+            color: #ff3d00;
+            margin-bottom: 10px;
+        }
+        
+        .review-text {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .review-actions {
+            display: flex;
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        .review-action {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .review-action i {
+            margin-right: 5px;
+        }
+        
+        .review-action:hover {
+            color: #ff3d00;
+        }
+        
+        /* Modal para escribir reseñas */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background-color: #ff3d00;
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .close-modal {
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .review-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .review-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .stars-select {
+            display: flex;
+            gap: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .stars-select i {
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .stars-select i:hover,
+        .stars-select i.active {
+            color: #ff3d00;
+        }
+        
+        .review-form textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 150px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .review-form .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .btn-primary {
+            background-color: #ff3d00;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .btn-primary:hover {
+            background-color: #e53600;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .search-location {
+                border-left: none;
+                border-right: none;
+                border-top: 1px solid #e6e6e6;
+                border-bottom: 1px solid #e6e6e6;
+                padding: 0;
+            }
+            
+            .search-location input {
+                width: 100%;
+            }
+            
+            .business-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Nav-var -->
+    <div class="menu">
+        <ion-icon name="menu-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
+    </div>
+    <div class="barra-lateral">
+        <div>
+            <div class="nombre-pagina">
+                <ion-icon id="cloud" name="fast-food-outline"></ion-icon>
+                <span>Juarnachaz</span>
+            </div>
+        </div>
+        <nav class="navegacion">
+            <ul>
+                <li>
+                    <a id="inicio" href="/index.html">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a id="login" href="/Login/Login.html">
+                        <ion-icon name="log-in-outline"></ion-icon>
+                        <span>Inicia sesi&oacute;n</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Registro/registrar-negocio.html">
+                        <ion-icon name="pin-outline"></ion-icon>
+                        <span>¡Registra tu negocio!</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Restaurantes/restaurantes.html">
+                        <ion-icon name="star-half-outline"></ion-icon>
+                        <span>Restaurantes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Resenas/resenas.html">
+                        <ion-icon name="chatbubble-outline"></ion-icon>
+                        <span>Reseñas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Dashboard/dashboard.html">
+                        <ion-icon name="desktop-outline"></ion-icon>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <ion-icon name="rocket-outline"></ion-icon>
+                        <span>¿Quiénes somos?</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="cerrar-sesion">
+                        <ion-icon name="log-out-outline"></ion-icon>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div>
+            <div class="linea"></div>
+            <div class="modo-oscuro">
+                <div class="info">
+                    <ion-icon name="moon-outline"></ion-icon>
+                    <span>darkmode</span>
+                </div>
+                <div class="switch">
+                    <div class="base">
+                        <div class="circulo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Nav-Bar -->
+    
+    <div class="main-content">
+        <div class="review-header">
+            <h1>Encuentra un negocio para reseñar</h1>
+            <p>Comparte tu experiencia y ayuda a otros a descubrir los mejores lugares de la ciudad</p>
+        </div>
+        
+        <div class="search-container">
+            <div class="search-bar">
+                <div class="search-input">
+                    <input type="text" id="business-search" placeholder="Busca un restaurante, cafetería, taquería...">
+                </div>
+                <div class="search-location">
+                    <input type="text" id="location-search" placeholder="Ubicación">
+                </div>
+                <button class="search-button" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="popular-businesses">
+            <h2>Negocios populares para reseñar</h2>
+            <div class="business-grid" id="business-container">
+                <!-- Los negocios se cargarán dinámicamente aquí -->
+                <!-- Ejemplo de un negocio -->
+                <div class="business-card" data-id="1">
+                    <div class="business-image">
+                        <img src="/img/PIZZA.jpg" alt="Pizzeria la Yemi" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="business-info">
+                        <h3 class="business-name">Pizzeria la Yemi</h3>
+                        <div class="business-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-count">28 reseñas</span>
+                        </div>
+                        <div class="business-category">
+                            <i class="fas fa-utensils"></i> Pizzería
+                        </div>
+                        <a href="#" class="write-review-btn" onclick="openReviewModal(1, 'Pizzeria la Yemi'); return false;">Escribir una reseña</a>
+                    </div>
+                </div>
+                
+                <div class="business-card" data-id="2">
+                    <div class="business-image">
+                        <img src="/img/TACOS.jpg" alt="Taqueria Javi" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="business-info">
+                        <h3 class="business-name">Taqueria Javi</h3>
+                        <div class="business-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="review-count">45 reseñas</span>
+                        </div>
+                        <div class="business-category">
+                            <i class="fas fa-utensils"></i> Tacos
+                        </div>
+                        <a href="#" class="write-review-btn" onclick="openReviewModal(2, 'Taqueria Javi'); return false;">Escribir una reseña</a>
+                    </div>
+                </div>
+                
+                <div class="business-card" data-id="3">
+                    <div class="business-image">
+                        <img src="/img/cafe.jpg" alt="Café Nuevo" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="business-info">
+                        <h3 class="business-name">Café Nuevo</h3>
+                        <div class="business-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-count">36 reseñas</span>
+                        </div>
+                        <div class="business-category">
+                            <i class="fas fa-coffee"></i> Café
+                        </div>
+                        <a href="#" class="write-review-btn" onclick="openReviewModal(3, 'Café Nuevo'); return false;">Escribir una reseña</a>
+                    </div>
+                </div>
+                
+                <div class="business-card" data-id="4">
+                    <div class="business-image">
+                        <img src="/img/posole.jpg" alt="El Pozolero" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="business-info">
+                        <h3 class="business-name">El Pozolero</h3>
+                        <div class="business-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="review-count">22 reseñas</span>
+                        </div>
+                        <div class="business-category">
+                            <i class="fas fa-utensils"></i> Comida Mexicana
+                        </div>
+                        <a href="#" class="write-review-btn" onclick="openReviewModal(4, 'El Pozolero'); return false;">Escribir una reseña</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para escribir reseñas -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Escribe una reseña</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="review-form" class="review-form">
+                    <input type="hidden" id="business-id">
+                    <div class="form-group">
+                        <h3 id="review-business-name">Nombre del Negocio</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>¿Cómo calificarías este lugar?</label>
+                        <div class="stars-select">
+                            <i class="far fa-star" data-value="1"></i>
+                            <i class="far fa-star" data-value="2"></i>
+                            <i class="far fa-star" data-value="3"></i>
+                            <i class="far fa-star" data-value="4"></i>
+                            <i class="far fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="rating-value" name="rating" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="review-text">Tu reseña</label>
+                        <textarea id="review-text" name="review" placeholder="Comparte tu experiencia con los demás..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancel-review">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="submit-review">Publicar Reseña</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script type="module" src="/Nav-Bar/nav-bar.js"></script>
+    <script src="resenas.js"></script>
+</body>
+</html>

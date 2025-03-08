@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Cuando tengas tu API, descomenta y adapta este código:
                     /*
-                    const response = await fetch(`http://localhost:3001/api/negocios/${currentNegocioId}/imagenes/${imagenId}/portada`, {
+                    const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/${currentNegocioId}/imagenes/${imagenId}/portada`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -943,7 +943,7 @@ if (btnConfirmarEliminar) {
             }
             
             try {
-                const response = await fetch(`http://localhost:3001/api/negocios/${currentNegocioId}`, {
+                const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/${currentNegocioId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1067,7 +1067,7 @@ if (btnConfirmarEliminar) {
             });
             
             try {
-                const response = await fetch(`http://localhost:3001/api/negocios/${currentNegocioId}/horarios`, {
+                const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/${currentNegocioId}/horarios`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

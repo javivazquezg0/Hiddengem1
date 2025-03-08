@@ -33,7 +33,7 @@ db.getConnection((err, connection) => {
 // Middlewares
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3001', // Ajusta esto a la URL de tu frontend
+  origin: '*', // Permite solicitudes desde cualquier origen durante desarrollo
   credentials: true
 }));
 
@@ -211,24 +211,22 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
     estado, 
     telefono, 
     correo
-    } = req.body;
+  } = req.body;
 
-  // Detectar y procesar los horarios, sea cual sea el formato en que lleguen
+  // Procesar horarios (mantén el código existente para esto)
   let horarios = [];
   
-  // Caso 1: Los horarios vienen como un array de objetos (formato ideal)
+  // Código para procesar horarios que ya existía en tu server.js
   if (req.body.horarios && Array.isArray(req.body.horarios)) {
     horarios = req.body.horarios;
   } 
-  // Caso 2: Los horarios vienen en arrays separados con notación de array (dia_inicio[], dia_fin[], etc.)
   else if (req.body['dia_inicio[]']) {
-    // Convertir a array si es un solo valor
+    // [Mantén el código existente para procesar horarios]
     const diaInicio = Array.isArray(req.body['dia_inicio[]']) ? req.body['dia_inicio[]'] : [req.body['dia_inicio[]']];
     const diaFin = Array.isArray(req.body['dia_fin[]']) ? req.body['dia_fin[]'] : [req.body['dia_fin[]']];
     const apertura = Array.isArray(req.body['apertura[]']) ? req.body['apertura[]'] : [req.body['apertura[]']];
     const cierre = Array.isArray(req.body['cierre[]']) ? req.body['cierre[]'] : [req.body['cierre[]']];
     
-    // Construir array de horarios
     for (let i = 0; i < diaInicio.length; i++) {
       horarios.push({
         dia: `${diaInicio[i]} a ${diaFin[i]}`,
@@ -237,30 +235,17 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
       });
     }
   }
-  // Caso 3: Los horarios vienen en arrays separados sin notación de array
   else if (req.body.dia_inicio) {
-    // Convertir a array si es un solo valor
-    const diaInicio = Array.isArray(req.body.dia_inicio) ? req.body.dia_inicio : [req.body.dia_inicio];
-    const diaFin = Array.isArray(req.body.dia_fin) ? req.body.dia_fin : [req.body.dia_fin];
-    const apertura = Array.isArray(req.body.apertura) ? req.body.apertura : [req.body.apertura];
-    const cierre = Array.isArray(req.body.cierre) ? req.body.cierre : [req.body.cierre];
-    
-    // Construir array de horarios
-    for (let i = 0; i < diaInicio.length; i++) {
-      horarios.push({
-        dia: `${diaInicio[i]} a ${diaFin[i]}`,
-        apertura: apertura[i],
-        cierre: cierre[i]
-      });
-    }
+    // [Mantén el código existente para procesar horarios]
+    // ...
   }
 
-  // Validación de campos mínimos
+  // Validaciones (mantén el código existente)
   if (!nombre || !calle) {
     return res.status(400).json({ error: 'El nombre y la dirección son obligatorios' });
   }
 
-  // Si no hay horarios definidos, crear un horario por defecto
+  // Horarios por defecto (mantén el código existente)
   if (horarios.length === 0) {
     horarios = [{
       dia: 'Lunes a Viernes',
@@ -287,14 +272,14 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
         return res.status(500).json({ error: 'Error al iniciar transacción' });
       }
 
-      // Insertar el negocio
+      // MODIFICACIÓN: Incluir id_user en la consulta de inserción
       connection.query(
         `INSERT INTO negocios 
          (nombre, descripcion, calle, numero_exterior, numero_interior, 
-          colonia, codigo_postal, municipio, estado, telefono, correo)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          colonia, codigo_postal, municipio, estado, telefono, correo, id_user)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [nombre, descripcion, calle, numero_exterior, numero_interior, 
-         colonia, codigo_postal, municipio, estado, telefono, correo],
+         colonia, codigo_postal, municipio, estado, telefono, correo, req.user.id],
         (err, result) => {
           if (err) {
             return connection.rollback(() => {
@@ -307,6 +292,7 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
           const idNegocio = result.insertId;
           console.log('Negocio insertado con ID:', idNegocio);
           
+          // [Mantén el resto del código para insertar horarios]
           // Preparar consulta para horarios
           const horariosValues = [];
           const horariosPlaceholders = [];
@@ -353,7 +339,7 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
               });
             });
           } else {
-            // Si no hay horarios (aunque esto no debería ocurrir según tu validación)
+            // Si no hay horarios
             connection.commit(err => {
               if (err) {
                 return connection.rollback(() => {
@@ -377,7 +363,13 @@ app.post('/api/negocios', authenticateToken, (req, res) => {
 });
 
 // Obtener negocios (requiere autenticación)
-app.get('/api/negocios', (req, res) => {
+app.get('/api/negocios', authenticateToken, (req, res) => {
+  getAllUserBusinesses(req.user.id, res);
+});  
+
+// Esta función es útil si tienes usuarios que podrían usar tanto login local como Google
+function getAllUserBusinesses(userId, res) {
+  // Esta consulta busca negocios relacionados con el usuario por ambos campos: id_user e id_Usuario
   const query = `
     SELECT n.*, 
            AVG(r.calificacion) AS promedio_calificaciones, 
@@ -385,67 +377,150 @@ app.get('/api/negocios', (req, res) => {
     FROM negocios n
     LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
     LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+    WHERE n.id_user = ? OR n.id_Usuario = ?
     GROUP BY n.id_Negocios
   `;
-  db.query(query, (err, resultados) => {
+  
+  db.query(query, [userId, userId], (err, resultados) => {
     if (err) {
       console.error('Error al obtener los negocios:', err);
       return res.status(500).json({ error: 'Error al obtener los negocios' });
     }
+    
+    console.log(`Negocios encontrados (ambos tipos de login) para usuario ${userId}: ${resultados.length}`);
     res.json(resultados);
   });
-});
-
-// CORREGIDO: Endpoint para negocios públicos
-app.get('/api/negocios/publicos', (req, res) => {
-  try {
-    // Consulta SQL mejorada con JOIN para obtener el horario de apertura y cierre del negocio
-    const query = `
-    SELECT 
-      n.id_Negocios,
-      n.nombre,
-      n.descripcion,
-      COALESCE(n.categoria, 'Restaurante') as categoria,
-      n.calle,
-      n.numero_exterior,
-      CONCAT(n.calle, ' ', n.numero_exterior, ', ', n.colonia) AS direccion,
-      n.colonia,
-      n.municipio,
-      n.estado,
-      n.telefono,
-      n.correo,
-      (SELECT hora_apertura FROM horarios_negocios WHERE id_Negocio = n.id_Negocios LIMIT 1) as horario_apertura,
-      (SELECT hora_cierre FROM horarios_negocios WHERE id_Negocio = n.id_Negocios LIMIT 1) as horario_cierre,
-      (SELECT url_foto FROM fotos_negocios WHERE id_Negocios = n.id_Negocios LIMIT 1) as imagen,
-      'default' as calificacion_texto,
-      4.5 as calificacion,
-      0 as total_resenas
-    FROM 
-      negocios n
-    GROUP BY 
-      n.id_Negocios
-    ORDER BY 
-      n.nombre ASC
+}
+// Esta función es útil si tienes usuarios que podrían usar tanto login local como Google
+function getAllUserBusinesses(userId, res) {
+  // Esta consulta busca negocios relacionados con el usuario por ambos campos: id_user e id_Usuario
+  const query = `
+    SELECT n.*, 
+           AVG(r.calificacion) AS promedio_calificaciones, 
+           COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada
+    FROM negocios n
+    LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
+    LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+    WHERE n.id_user = ? OR n.id_Usuario = ?
+    GROUP BY n.id_Negocios
   `;
+  
+  db.query(query, [userId, userId], (err, resultados) => {
+    if (err) {
+      console.error('Error al obtener los negocios:', err);
+      return res.status(500).json({ error: 'Error al obtener los negocios' });
+    }
     
-    db.query(query, (err, results) => {
+    console.log(`Negocios encontrados (ambos tipos de login) para usuario ${userId}: ${resultados.length}`);
+    res.json(resultados);
+  });
+}
+
+
+// Endpoint para filtrar negocios
+app.get('/api/negocios/filtro', (req, res) => {
+  try {
+    // Obtener parámetros de consulta
+    const searchTerm = req.query.q ? req.query.q.toLowerCase() : '';
+    const categoria = req.query.categoria || '';
+    const calificacion = parseFloat(req.query.calificacion) || 0;
+    
+    console.log('Filtrando con parámetros:', { 
+      searchTerm, 
+      categoria, 
+      calificacion 
+    });
+    
+    // Construir consulta SQL base
+    let query = `
+      SELECT 
+        n.id_Negocios,
+        n.nombre,
+        n.descripcion,
+        COALESCE(n.categoria, 'Restaurante') as categoria,
+        n.calle,
+        n.numero_exterior,
+        n.colonia,
+        n.municipio,
+        n.estado,
+        CONCAT(n.calle, ' ', n.numero_exterior, ', ', n.colonia) AS direccion,
+        n.telefono,
+        (SELECT hora_apertura FROM horarios_negocios WHERE id_Negocio = n.id_Negocios LIMIT 1) as horario_apertura,
+        (SELECT hora_cierre FROM horarios_negocios WHERE id_Negocio = n.id_Negocios LIMIT 1) as horario_cierre,
+        (SELECT url_foto FROM fotos_negocios WHERE id_Negocios = n.id_Negocios LIMIT 1) as foto_portada,
+        COALESCE(AVG(r.calificacion), 4.5) as promedio_calificaciones,
+        COUNT(DISTINCT r.id_Resenas) as total_resenas
+      FROM 
+        negocios n
+      LEFT JOIN
+        resenas r ON n.id_Negocios = r.id_Negocios
+    `;
+    
+    // Condiciones WHERE
+    const conditions = [];
+    const params = [];
+    
+    // Filtro por término de búsqueda
+    if (searchTerm) {
+      conditions.push(`(
+        LOWER(n.nombre) LIKE ? OR 
+        LOWER(n.descripcion) LIKE ? OR 
+        LOWER(n.categoria) LIKE ? OR
+        LOWER(n.calle) LIKE ? OR
+        LOWER(n.colonia) LIKE ? OR
+        LOWER(n.municipio) LIKE ? OR
+        LOWER(n.estado) LIKE ?
+      )`);
+      
+      const searchPattern = `%${searchTerm}%`;
+      params.push(
+        searchPattern, 
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern
+      );
+    }
+    
+    // Filtro por categoría
+    if (categoria) {
+      conditions.push('n.categoria = ?');
+      params.push(categoria);
+    }
+    
+    // Añadir condiciones WHERE si existen
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
+    
+    // Agrupar por negocio
+    query += ' GROUP BY n.id_Negocios';
+    
+    // Filtro por calificación (se aplica después del GROUP BY)
+    if (calificacion > 0) {
+      query += ' HAVING promedio_calificaciones >= ?';
+      params.push(calificacion);
+    }
+    
+    // Ordenar resultados
+    query += ' ORDER BY n.nombre ASC';
+    
+    // Ejecutar consulta
+    db.query(query, params, (err, results) => {
       if (err) {
-        console.error('Error al obtener negocios públicos:', err);
+        console.error('Error al filtrar negocios:', err);
         return res.status(500).json({ 
-          error: 'Error al obtener negocios públicos',
+          error: 'Error al filtrar negocios',
           message: err.message
         });
       }
-
-      // Verificar si tenemos resultados
-      if (results.length === 0) {
-        return res.json([]);
-      }
       
-      // Formatear resultados para que coincidan con lo esperado por el frontend
+      // Formatear resultados
       const negociosFormateados = results.map(negocio => {
         // Asegurarse de que imagen contiene una ruta válida
-        let imagen = negocio.imagen;
+        let imagen = negocio.foto_portada;
         
         if (!imagen || imagen === null || imagen === '') {
           // Asignar imagen por categoría
@@ -455,8 +530,8 @@ app.get('/api/negocios/publicos', (req, res) => {
             imagen = '/img/PIZZA.jpg';
           } else if (categoria.includes('taco')) {
             imagen = '/img/TACOS.jpg';
-          } else if (categoria.includes('birria')) {
-            imagen = '/img/Birria1.jpg';
+          } else if (categoria.includes('cafe')) {
+            imagen = '/img/cafe.jpg';
           } else if (categoria.includes('pozole')) {
             imagen = '/img/posole.jpg';
           } else {
@@ -469,35 +544,22 @@ app.get('/api/negocios/publicos', (req, res) => {
           imagen = '/' + imagen;
         }
         
-
-        
-
-        // Verificar si es una URL externa o una ruta local
-        if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
-          // Es una URL externa, mantenerla como está
-          console.log(`URL de imagen externa detectada: ${imagen}`);
-        } else {
-          // Es una ruta local, verificar si existe
-          const rutaImagen = path.join(__dirname, imagen.startsWith('/') ? imagen.substring(1) : imagen);
-          
-          // Si la imagen no existe, usar la imagen por defecto
-          if (!fs.existsSync(rutaImagen)) {
-            imagen = '/img/default-restaurant.jpg';
-            console.log(`Imagen no encontrada: ${rutaImagen}, usando imagen por defecto`);
-          }
-        }
-
         return {
           id_Negocios: negocio.id_Negocios,
           nombre: negocio.nombre,
           descripcion: negocio.descripcion,
           categoria: negocio.categoria,
+          calle: negocio.calle,
+          numero_exterior: negocio.numero_exterior,
+          colonia: negocio.colonia,
+          municipio: negocio.municipio,
+          estado: negocio.estado,
           direccion: negocio.direccion,
           telefono: negocio.telefono,
           horario_apertura: negocio.horario_apertura || '09:00',
           horario_cierre: negocio.horario_cierre || '22:00',
-          imagen: imagen,
-          calificacion: parseFloat(negocio.calificacion || 4.5).toFixed(1),
+          foto_portada: imagen,
+          promedio_calificaciones: parseFloat(negocio.promedio_calificaciones || 0).toFixed(1),
           total_resenas: negocio.total_resenas || 0
         };
       });
@@ -505,14 +567,155 @@ app.get('/api/negocios/publicos', (req, res) => {
       res.json(negociosFormateados);
     });
   } catch (error) {
-    console.error('Error en endpoint /api/negocios/publicos:', error);
+    console.error('Error en endpoint de filtrado:', error);
     res.status(500).json({ 
-      error: 'Error al obtener los negocios públicos',
+      error: 'Error al filtrar negocios',
       message: error.message
     });
   }
 });
 
+
+// CORREGIDO: Endpoint para negocios públicos
+// Añade o modifica la función que muestra los negocios en resenas.js
+function displayBusinesses(businesses) {
+  const businessContainer = document.querySelector('.business-grid');
+  
+  if (!businessContainer) {
+      console.error("No se encontró el contenedor de negocios (.business-grid)");
+      return;
+  }
+  
+  // Limpiar el contenedor
+  businessContainer.innerHTML = '';
+  
+  // Generar HTML para cada negocio
+  businesses.forEach(business => {
+      // Verificar la imagen
+      let imageSrc = business.imagen || business.foto_portada || '/img/default-restaurant.jpg';
+      
+      // Asegurar que la imagen tenga una ruta válida
+      if (!imageSrc.startsWith('/') && !imageSrc.startsWith('http')) {
+          imageSrc = '/' + imageSrc;
+      }
+      
+      // Generar HTML de estrellas
+      const starsHtml = Utils.generateStarsHtml(business.promedio_calificaciones || 4);
+      
+      // Categoría del negocio
+      const categoria = business.categoria || 'Restaurante';
+      
+      // Icono según categoría
+      let categoriaIcon = 'utensils';
+      if (categoria.toLowerCase().includes('café') || categoria.toLowerCase().includes('cafe')) {
+          categoriaIcon = 'coffee';
+      } else if (categoria.toLowerCase().includes('taco')) {
+          categoriaIcon = 'hamburger';
+      } else if (categoria.toLowerCase().includes('pizza')) {
+          categoriaIcon = 'pizza-slice';
+      }
+      
+      // Crear el elemento del negocio
+      const businessCard = document.createElement('div');
+      businessCard.className = 'business-card';
+      businessCard.dataset.id = business.id_Negocios;
+      
+      // IMPORTANTE: Asegúrate de mostrar correctamente el contador de reseñas
+      const reviewCount = parseInt(business.total_resenas) || 0;
+      
+      businessCard.innerHTML = `
+          <div class="business-image">
+              <img src="${imageSrc}" alt="${business.nombre}" onerror="this.src='/img/default-restaurant.jpg'">
+          </div>
+          <div class="business-info">
+              <h3 class="business-name">${business.nombre}</h3>
+              <div class="business-rating">
+                  <div class="stars">
+                      ${starsHtml}
+                  </div>
+                  <span class="review-count">${reviewCount} reseñas</span>
+              </div>
+              <div class="business-category">
+                  <i class="fas fa-${categoriaIcon}"></i> ${categoria}
+              </div>
+              <a href="#" class="write-review-btn" onclick="openReviewModal(${business.id_Negocios}, '${business.nombre.replace(/'/g, "\\'")}'); return false;">Escribir una reseña</a>
+          </div>
+      `;
+      
+      businessContainer.appendChild(businessCard);
+  });
+}
+// Endpoint para negocios públicos (añade esto a tu server.js)
+app.get('/api/negocios/publicos', (req, res) => {
+  console.log('Solicitud recibida para /api/negocios/publicos');
+  
+  const query = `
+      SELECT n.*, 
+             COALESCE(AVG(r.calificacion), 4.5) AS promedio_calificaciones, 
+             COUNT(r.id_Resenas) AS total_resenas,
+             COALESCE(f.url_foto, '/img/default-restaurant.jpg') AS foto_portada,
+             n.categoria
+      FROM negocios n
+      LEFT JOIN resenas r ON n.id_Negocios = r.id_Negocios
+      LEFT JOIN fotos_negocios f ON n.id_Negocios = f.id_Negocios AND f.tipo = 'portada'
+      GROUP BY n.id_Negocios
+      ORDER BY total_resenas DESC
+  `;
+  
+  db.query(query, (err, resultados) => {
+      if (err) {
+          console.error('Error al obtener los negocios públicos:', err);
+          return res.status(500).json({ error: 'Error al obtener los negocios' });
+      }
+      
+      // Formatea los resultados para asegurarnos de que tengan todos los campos necesarios
+      const negociosFormateados = resultados.map(negocio => {
+          // Asegurar que promedio_calificaciones sea un número
+          const promedio = negocio.promedio_calificaciones ? 
+              parseFloat(negocio.promedio_calificaciones).toFixed(1) : '4.5';
+          
+          // Asegurarse de que imagen contiene una ruta válida
+          let imagen = negocio.foto_portada;
+          
+          // Asignar imagen por categoría si no tiene una
+          if (!imagen || imagen === null || imagen === '') {
+              const categoria = (negocio.categoria || '').toLowerCase();
+              
+              if (categoria.includes('pizza')) {
+                  imagen = '/img/PIZZA.jpg';
+              } else if (categoria.includes('taco')) {
+                  imagen = '/img/TACOS.jpg';
+              } else if (categoria.includes('cafe')) {
+                  imagen = '/img/cafe.jpg';
+              } else if (categoria.includes('pozole')) {
+                  imagen = '/img/posole.jpg';
+              } else {
+                  imagen = '/img/default-restaurant.jpg';
+              }
+          }
+          
+          // Si la ruta no comienza con / o http, agregarle /
+          if (imagen && !imagen.startsWith('/') && !imagen.startsWith('http')) {
+              imagen = '/' + imagen;
+          }
+          
+          // Asignar categoría por defecto si no tiene
+          const categoria = negocio.categoria || 'Restaurante';
+          
+          return {
+              ...negocio,
+              promedio_calificaciones: promedio,
+              foto_portada: imagen,
+              imagen: imagen, // Para compatibilidad con código existente
+              total_resenas: negocio.total_resenas || 0,
+              categoria: categoria
+          };
+      });
+      
+      console.log(`Retornando ${negociosFormateados.length} negocios públicos`);
+      res.json(negociosFormateados);
+  });
+});
 
 // 3. Agrega este endpoint para manejar imágenes por defecto según categoría
 app.get('/api/imagen-categoria/:categoria', (req, res) => {
@@ -813,141 +1016,239 @@ app.get('/img/:imageName', (req, res) => {
 // Endpoint para obtener reseñas de un negocio
 app.get('/api/negocios/:id/resenas', async (req, res) => {
   try {
-    const negocioId = req.params.id;
-    
-    // Consulta adaptada a tu estructura de base de datos actual
-    const query = `
-      SELECT 
-        r.*,
-        u.nombre_usuario as nombre_usuario
-      FROM 
-        resenas r
-      LEFT JOIN 
-        users u ON r.id_Usuario = u.id
-      WHERE 
-        r.id_Negocios = ?
-      ORDER BY 
-        r.fecha_resena DESC
-    `;
-    
-    db.query(query, [negocioId], (err, resenas) => {
-      if (err) {
-        console.error('Error al obtener reseñas:', err);
-        return res.status(500).json({ error: 'Error al obtener reseñas' });
-      }
+      const negocioId = req.params.id;
       
-      // Si no hay reseñas, devolver array vacío
-      if (resenas.length === 0) {
-        return res.json([]);
-      }
+      // Consulta adaptada para manejar la estructura correcta de la tabla users
+      // Modificamos la consulta para usar el campo correcto o proporcionar un valor por defecto
+      const query = `
+          SELECT 
+              r.*,
+              COALESCE(u.display_name, 'Usuario anónimo') as nombre_usuario
+          FROM 
+              resenas r
+          LEFT JOIN 
+              users u ON r.id_Usuario = u.id
+          WHERE 
+              r.id_Negocios = ?
+          ORDER BY 
+              r.fecha_resena DESC
+      `;
       
-      // Formatear fechas y otros campos
-      const resenasFormateadas = resenas.map(resena => {
-        return {
-          ...resena,
-          fecha_creacion: resena.fecha_resena,
-          comentario: resena.comentario || 'Sin comentario',
-          nombre_usuario: resena.nombre_usuario || 'Usuario anónimo'
-        };
+      db.query(query, [negocioId], (err, resenas) => {
+          if (err) {
+              console.error('Error al obtener reseñas:', err);
+              return res.status(500).json({ error: 'Error al obtener reseñas' });
+          }
+          
+          // Si no hay reseñas, devolver array vacío
+          if (resenas.length === 0) {
+              return res.json([]);
+          }
+          
+          // Formatear fechas y otros campos
+          const resenasFormateadas = resenas.map(resena => {
+              return {
+                  ...resena,
+                  fecha_creacion: resena.fecha_resena,
+                  comentario: resena.comentario || 'Sin comentario',
+                  nombre_usuario: resena.nombre_usuario || 'Usuario anónimo'
+              };
+          });
+          
+          res.json(resenasFormateadas);
       });
       
-      res.json(resenasFormateadas);
-    });
-    
   } catch (error) {
-    console.error('Error al obtener reseñas:', error);
-    res.status(500).json({ 
-      error: 'Error al obtener reseñas',
-      message: error.message
-    });
+      console.error('Error al obtener reseñas:', error);
+      res.status(500).json({ 
+          error: 'Error al obtener reseñas',
+          message: error.message
+      });
   }
 });
 
 // Endpoint para añadir una nueva reseña
 app.post('/api/negocios/:id/resenas', authenticateToken, async (req, res) => {
   try {
-    const idNegocio = req.params.id;
-    const idUsuario = req.user.id; // Usando el objeto user del middleware authenticateToken
-    const { calificacion, comentario } = req.body;
-    
-    // Validar datos
-    if (!calificacion || !comentario) {
-      return res.status(400).json({ error: 'La calificación y el comentario son obligatorios' });
-    }
-    
-    if (calificacion < 1 || calificacion > 5) {
-      return res.status(400).json({ error: 'La calificación debe estar entre 1 y 5' });
-    }
-    
-    // Verificar si el negocio existe
-    db.query(
-      'SELECT id_Negocios FROM negocios WHERE id_Negocios = ?',
-      [idNegocio],
-      (err, negocios) => {
-        if (err) {
-          console.error('Error al verificar negocio:', err);
-          return res.status(500).json({ error: 'Error interno' });
-        }
-        
-        if (negocios.length === 0) {
-          return res.status(404).json({ error: 'Negocio no encontrado' });
-        }
-        
-        // Verificar si el usuario ya ha dejado una reseña
-        db.query(
-          'SELECT id_Resenas FROM resenas WHERE id_Negocios = ? AND id_Usuario = ?',
-          [idNegocio, idUsuario],
-          (err, resenas) => {
-            if (err) {
-              console.error('Error al verificar reseñas existentes:', err);
-              return res.status(500).json({ error: 'Error interno' });
-            }
-            
-            if (resenas.length > 0) {
-              // Actualizar reseña existente
-              db.query(
-                'UPDATE resenas SET calificacion = ?, comentario = ? WHERE id_Negocios = ? AND id_Usuario = ?',
-                [calificacion, comentario, idNegocio, idUsuario],
-                (err) => {
-                  if (err) {
-                    console.error('Error al actualizar reseña:', err);
-                    return res.status(500).json({ error: 'Error al actualizar reseña' });
-                  }
-                  
-                  res.json({ message: 'Reseña actualizada correctamente' });
-                }
-              );
-            } else {
-              // Crear nueva reseña
-              db.query(
-                'INSERT INTO resenas (id_Negocios, id_Usuario, calificacion, comentario, fecha_resena) VALUES (?, ?, ?, ?, NOW())',
-                [idNegocio, idUsuario, calificacion, comentario],
-                (err, result) => {
-                  if (err) {
-                    console.error('Error al crear reseña:', err);
-                    return res.status(500).json({ error: 'Error al crear reseña' });
-                  }
-                  
-                  res.status(201).json({ 
-                    message: 'Reseña creada correctamente',
-                    id_Resena: result.insertId
-                  });
-                }
-              );
-            }
-          }
-        );
+      const idNegocio = req.params.id;
+      const idUsuario = req.user.id; // Usando el objeto user del middleware authenticateToken
+      const { calificacion, comentario } = req.body;
+      
+      // Validar datos
+      if (!calificacion || !comentario) {
+          return res.status(400).json({ error: 'La calificación y el comentario son obligatorios' });
       }
-    );
+      
+      if (calificacion < 1 || calificacion > 5) {
+          return res.status(400).json({ error: 'La calificación debe estar entre 1 y 5' });
+      }
+      
+      // Verificar si el negocio existe
+      db.query(
+          'SELECT id_Negocios FROM negocios WHERE id_Negocios = ?',
+          [idNegocio],
+          (err, negocios) => {
+              if (err) {
+                  console.error('Error al verificar negocio:', err);
+                  return res.status(500).json({ error: 'Error interno' });
+              }
+              
+              if (negocios.length === 0) {
+                  return res.status(404).json({ error: 'Negocio no encontrado' });
+              }
+              
+              // Verificar si el usuario ya ha dejado una reseña
+              db.query(
+                  'SELECT id_Resenas FROM resenas WHERE id_Negocios = ? AND id_Usuario = ?',
+                  [idNegocio, idUsuario],
+                  (err, resenas) => {
+                      if (err) {
+                          console.error('Error al verificar reseñas existentes:', err);
+                          return res.status(500).json({ error: 'Error interno' });
+                      }
+                      
+                      const currentDate = new Date();
+                      
+                      if (resenas.length > 0) {
+                          // Actualizar reseña existente
+                          db.query(
+                              'UPDATE resenas SET calificacion = ?, comentario = ?, fecha_resena = ? WHERE id_Negocios = ? AND id_Usuario = ?',
+                              [calificacion, comentario, currentDate, idNegocio, idUsuario],
+                              (err) => {
+                                  if (err) {
+                                      console.error('Error al actualizar reseña:', err);
+                                      return res.status(500).json({ error: 'Error al actualizar reseña' });
+                                  }
+                                  
+                                  res.json({ 
+                                      message: 'Reseña actualizada correctamente',
+                                      id_Resena: resenas[0].id_Resenas
+                                  });
+                              }
+                          );
+                      } else {
+                          // Crear nueva reseña con la fecha actual
+                          db.query(
+                              'INSERT INTO resenas (id_Negocios, id_Usuario, calificacion, comentario, fecha_resena) VALUES (?, ?, ?, ?, ?)',
+                              [idNegocio, idUsuario, calificacion, comentario, currentDate],
+                              (err, result) => {
+                                  if (err) {
+                                      console.error('Error al crear reseña:', err);
+                                      return res.status(500).json({ error: 'Error al crear reseña' });
+                                  }
+                                  
+                                  // Obtener información del usuario para la respuesta
+                                  db.query(
+                                      'SELECT display_name FROM users WHERE id = ?',
+                                      [idUsuario],
+                                      (userErr, userData) => {
+                                          const userName = userErr || !userData.length ? 'Usuario anónimo' : userData[0].display_name;
+                                          
+                                          res.status(201).json({ 
+                                              message: 'Reseña creada correctamente',
+                                              id_Resena: result.insertId,
+                                              fecha_resena: currentDate,
+                                              nombre_usuario: userName
+                                          });
+                                      }
+                                  );
+                              }
+                          );
+                      }
+                  }
+              );
+          }
+      );
   } catch (error) {
-    console.error('Error al crear/actualizar reseña:', error);
-    res.status(500).json({ 
-      error: 'Error al crear/actualizar la reseña',
-      message: error.message
-    });
+      console.error('Error al crear/actualizar reseña:', error);
+      res.status(500).json({ 
+          error: 'Error al crear/actualizar la reseña',
+          message: error.message
+      });
   }
 });
 
+// Configuración para mejorar el manejo de errores
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Promesa rechazada no manejada:', reason);
+  // No cerrar el servidor, solo registrar el error
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Excepción no capturada:', error);
+  // No cerrar el servidor a menos que sea crítico
+  if (isServerFatalError(error)) {
+      console.error('Error fatal en el servidor, cerrando proceso');
+      process.exit(1);
+  }
+});
+
+// Función para determinar si un error es fatal para el servidor
+function isServerFatalError(error) {
+  // Considera fatal si es un error de sintaxis
+  if (error instanceof SyntaxError) return true;
+  
+  // Considera fatal si es un error de referencia (variable no definida)
+  if (error instanceof ReferenceError) return true;
+  
+  // Considera fatal si el mensaje sugiere un error grave
+  if (error.message && (
+      error.message.includes('Cannot find module') ||
+      error.message.includes('out of memory')
+  )) return true;
+  
+  // Por defecto, no considerar fatal
+  return false;
+}
+
+
+// Conexión a la base de datos con reintentos
+let dbConnectionAttempts = 0;
+const MAX_DB_CONNECTION_ATTEMPTS = 5;
+
+function connectDatabase() {
+  dbConnectionAttempts++;
+  
+  db.getConnection((err, connection) => {
+      if (err) {
+          console.error(`Error conectando a la base de datos (intento ${dbConnectionAttempts}):`, err);
+          
+          if (dbConnectionAttempts < MAX_DB_CONNECTION_ATTEMPTS) {
+              console.log(`Reintentando conexión en ${dbConnectionAttempts * 3} segundos...`);
+              setTimeout(connectDatabase, dbConnectionAttempts * 3000);
+              return;
+          } else {
+              console.error('Número máximo de intentos alcanzado. No se pudo conectar a la base de datos.');
+              // No cerrar el servidor, permitir que funcione con funcionalidad limitada
+          }
+      } else {
+          dbConnectionAttempts = 0;
+          console.log('Conectado a la base de datos MariaDB');
+          connection.release();
+      }
+  });
+}
+
+// Iniciar conexión
+connectDatabase();
+
+// Configurar reconexión periódica para verificar estado
+setInterval(() => {
+  db.getConnection((err, connection) => {
+      if (err) {
+          console.error('Error en verificación periódica de conexión:', err);
+          connectDatabase();
+      } else {
+          connection.ping((pingErr) => {
+              connection.release();
+              if (pingErr) {
+                  console.error('Error en ping a la base de datos:', pingErr);
+                  connectDatabase();
+              }
+          });
+      }
+  });
+}, 60000); // Cada minuto
 // Manejador de errores global
 app.use((err, req, res, next) => {
   console.error('Error no controlado:', err);

@@ -3,26 +3,637 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reseñas de Negocios</title>
+    <title>Juarnachaz - Descubre los mejores lugares para comer</title>
     <link rel="icon" type="image/jpg/gif" href="img/Logo"/>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/notifications.css">
     <link rel="stylesheet" href="/Nav-Bar/nav-bar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="utils.js"></script>
     <style>
-        /* Estilos para ajustar el contenido principal cuando la barra lateral esté contraída */
-        main, #negocios-container {
-            margin-left: 60px; /* Mismo ancho que la barra contraída */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .main-content {
+            margin-left: 60px;
             transition: margin-left 0.3s ease;
         }
         
-        /* Ajuste cuando la barra esté expandida (opcional) */
-        .barra-lateral.expandida ~ main,
-        .barra-lateral.expandida ~ #negocios-container {
-            margin-left: 250px; /* Mismo ancho que la barra expandida */
+        .barra-lateral.expandida ~ .main-content {
+            margin-left: 250px;
         }
         
-        @media (max-width: 600px) {
-            main, #negocios-container {
+        /* Hero section with search */
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/img/hero-background.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .hero-title {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .search-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0;
+            border: none;
+        }
+        
+        .search-input input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-location {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-left: 1px solid #e6e6e6;
+            border-right: 1px solid #e6e6e6;
+        }
+        
+        .search-location input {
+            padding: 15px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            width: 180px;
+        }
+        
+        .search-button {
+            background-color: #ff3d00;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-button:hover {
+            background-color: #e53600;
+        }
+        
+        /* Quick links */
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .quick-link i {
+            margin-right: 8px;
+        }
+        
+        /* Categories section */
+        .categories-section {
+            padding: 60px 20px;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: #333;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: #ff3d00;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .categories-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .category-card {
+            width: 180px;
+            text-align: center;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .category-image {
+            height: 120px;
+            overflow: hidden;
+        }
+        
+        .category-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .category-card:hover .category-image img {
+            transform: scale(1.05);
+        }
+        
+        .category-name {
+            padding: 15px 10px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        /* Featured businesses section */
+        .featured-section {
+            padding: 60px 20px;
+            background-color: #f8f8f8;
+        }
+        
+        .featured-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .featured-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .featured-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin: 0;
+        }
+        
+        .see-all-link {
+            color: #ff3d00;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .see-all-link:hover {
+            color: #e53600;
+            text-decoration: underline;
+        }
+        
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .business-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .business-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .business-image {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .business-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .business-card:hover .business-image img {
+            transform: scale(1.05);
+        }
+        
+        .business-info {
+            padding: 15px;
+        }
+        
+        .business-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 5px;
+            color: #333;
+        }
+        
+        .business-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .business-rating .stars {
+            color: #ff3d00;
+            margin-right: 8px;
+        }
+        
+        .business-rating .review-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .business-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .business-details i {
+            width: 16px;
+            margin-right: 5px;
+            text-align: center;
+        }
+        
+        /* Recent activity section */
+        .activity-section {
+            padding: 60px 20px;
+            background-color: white;
+        }
+        
+        .activity-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .review-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .review-header {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .reviewer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .reviewer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .reviewer-info {
+            flex: 1;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            margin: 0 0 5px;
+            color: #333;
+        }
+        
+        .review-date {
+            font-size: 0.9rem;
+            color: #999;
+        }
+        
+        .review-content {
+            margin-bottom: 15px;
+        }
+        
+        .review-business {
+            font-weight: 600;
+            margin: 0 0 10px;
+            color: #333;
+        }
+        
+        .review-stars {
+            color: #ff3d00;
+            margin-bottom: 10px;
+        }
+        
+        .review-text {
+            color: #555;
+            line-height: 1.5;
+            max-height: 4.5em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .review-actions {
+            display: flex;
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        .review-action {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .review-action i {
+            margin-right: 5px;
+        }
+        
+        .review-action:hover {
+            color: #ff3d00;
+        }
+        
+        /* Call to action section */
+        .cta-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/img/restaurant-interior.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta-description {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            background-color: #ff3d00;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button.outline {
+            background-color: transparent;
+            border: 2px solid white;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            background-color: #e53600;
+        }
+        
+        .cta-button.outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #333;
+            color: #ccc;
+            padding: 60px 20px 30px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        
+        .footer-section h3 {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background-color: #ff3d00;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .footer-links a:hover {
+            color: #ff3d00;
+        }
+        
+        .footer-links i, .footer-contact i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .footer-contact {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icon {
+            color: white;
+            background-color: #444;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background-color: #ff3d00;
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid #444;
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
                 margin-left: 0;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .search-location {
+                border-left: none;
+                border-right: none;
+                border-top: 1px solid #e6e6e6;
+                border-bottom: 1px solid #e6e6e6;
+                padding: 0;
+            }
+            
+            .search-location input {
+                width: 100%;
+            }
+            
+            .featured-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .activity-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -53,42 +664,42 @@
                         <span>Inicia sesi&oacute;n</span>
                     </a>
                 </li>
-            <li>
-                <a href="/Registro/registrar-negocio.html">
-                    <ion-icon name="pin-outline"></ion-icon>
-                    <span>¡Registra tu negocio!</span>
-                </a>
-            </li>
-            <li>
-                <a href="/Restaurantes/restaurantes.html">
-                    <ion-icon name="star-half-outline"></ion-icon>
-                    <span>Restaurantes</span>
-                </a>
-            </li>
-            <li>
-                <a href="/Dashboard/dashboard.html">
-                    <ion-icon name="desktop-outline"></ion-icon>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <ion-icon name="storefront-outline"></ion-icon>
-                    <span>puestos</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <ion-icon name="rocket-outline"></ion-icon>
-                    <span>¿quienes somos?</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" id="cerrar-sesion">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                    <span>Cerrar sesión</span>
-                </a>
-            </li>
+                <li>
+                    <a href="/Registro/registrar-negocio.html">
+                        <ion-icon name="pin-outline"></ion-icon>
+                        <span>¡Registra tu negocio!</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Restaurantes/restaurantes.html">
+                        <ion-icon name="star-half-outline"></ion-icon>
+                        <span>Restaurantes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Resenas/resenas.html">
+                        <ion-icon name="chatbubble-outline"></ion-icon>
+                        <span>Reseñas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Dashboard/dashboard.html">
+                        <ion-icon name="desktop-outline"></ion-icon>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <ion-icon name="rocket-outline"></ion-icon>
+                        <span>¿Quiénes somos?</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="cerrar-sesion">
+                        <ion-icon name="log-out-outline"></ion-icon>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
             </ul>
         </nav>
         <div>
@@ -107,19 +718,717 @@
             </div>
         </div>
     </div>
-    <header>
-        <h1>Reseñas de Negocios</h1>
-    </header>
-
-    <!-- Contenedor añadido -->
-    <div id="negocios-container" class="cards-container"></div>
-
-    <!-- Scripts al final del body -->
+    
+    <div class="main-content">
+        <!-- Hero section with search -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <h1 class="hero-title">Encuentra el mejor lugar para comer</h1>
+                <p class="hero-subtitle">Descubre restaurantes, cafeterías y negocios locales con reseñas reales de la comunidad</p>
+                
+                <div class="search-container">
+                    <div class="search-bar">
+                        <div class="search-input">
+                            <input type="text" id="business-search" placeholder="Busca restaurantes, tacos, café...">
+                        </div>
+                        <div class="search-location">
+                            <input type="text" id="location-search" placeholder="Ciudad o estado">
+                        </div>
+                        <button class="search-button" id="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="quick-links">
+                    <a href="/Restaurantes/restaurantes.html?categoria=Tacos" class="quick-link">
+                        <i class="fas fa-hamburger"></i> Tacos
+                    </a>
+                    <a href="/Restaurantes/restaurantes.html?categoria=Pizza" class="quick-link">
+                        <i class="fas fa-pizza-slice"></i> Pizza
+                    </a>
+                    <a href="/Restaurantes/restaurantes.html?categoria=Café" class="quick-link">
+                        <i class="fas fa-coffee"></i> Café
+                    </a>
+                    <a href="/Restaurantes/restaurantes.html?categoria=Comida+Mexicana" class="quick-link">
+                        <i class="fas fa-utensils"></i> Comida Mexicana
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Categories section -->
+        <section class="categories-section">
+            <h2 class="section-title">Explora por categoría</h2>
+            
+            <div class="categories-container">
+                <div class="category-card" onclick="location.href='/Restaurantes/restaurantes.html?categoria=Tacos'">
+                    <div class="category-image">
+                        <img src="/img/TACOS.jpg" alt="Tacos" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="category-name">Tacos</div>
+                </div>
+                
+                <div class="category-card" onclick="location.href='/Restaurantes/restaurantes.html?categoria=Pizza'">
+                    <div class="category-image">
+                        <img src="/img/PIZZA.jpg" alt="Pizza" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="category-name">Pizza</div>
+                </div>
+                
+                <div class="category-card" onclick="location.href='/Restaurantes/restaurantes.html?categoria=Café'">
+                    <div class="category-image">
+                        <img src="/img/cafe.jpg" alt="Café" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="category-name">Café</div>
+                </div>
+                
+                <div class="category-card" onclick="location.href='/Restaurantes/restaurantes.html?categoria=Pozole'">
+                    <div class="category-image">
+                        <img src="/img/posole.jpg" alt="Pozole" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="category-name">Pozole</div>
+                </div>
+                
+                <div class="category-card" onclick="location.href='/Restaurantes/restaurantes.html?categoria=Comida+Rápida'">
+                    <div class="category-image">
+                        <img src="/img/fastfood.jpg" alt="Comida Rápida" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="category-name">Comida Rápida</div>
+                </div>
+                
+                <div class="category-card" onclick="location.href='/Restaurantes/restaurantes.html'">
+                    <div class="category-image">
+                        <img src="/img/more.jpg" alt="Ver más" onerror="this.src='/img/default-restaurant.jpg'">
+                    </div>
+                    <div class="category-name">Ver más</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Featured businesses section -->
+        <section class="featured-section">
+            <div class="featured-container">
+                <div class="featured-header">
+                    <h2 class="featured-title">Restaurantes populares</h2>
+                    <a href="/Restaurantes/restaurantes.html" class="see-all-link">Ver todos <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="featured-grid" id="featured-businesses">
+                    <!-- Businesses will be loaded dynamically -->
+                    <!-- Example business card -->
+                    <div class="business-card" onclick="location.href='/Restaurantes/detalle-negocio.html?id=1'">
+                        <div class="business-image">
+                            <img src="/img/PIZZA.jpg" alt="Pizzeria la Yemi" onerror="this.src='/img/default-restaurant.jpg'">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Pizzeria la Yemi</h3>
+                            <div class="business-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="review-count">28 reseñas</span>
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-utensils"></i> Pizzería
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-map-marker-alt"></i> Centro
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="business-card" onclick="location.href='/Restaurantes/detalle-negocio.html?id=2'">
+                        <div class="business-image">
+                            <img src="/img/TACOS.jpg" alt="Taqueria Javi" onerror="this.src='/img/default-restaurant.jpg'">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Taqueria Javi</h3>
+                            <div class="business-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="review-count">45 reseñas</span>
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-utensils"></i> Tacos
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-map-marker-alt"></i> Reforma
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="business-card" onclick="location.href='/Restaurantes/detalle-negocio.html?id=3'">
+                        <div class="business-image">
+                            <img src="/img/cafe.jpg" alt="Café Nuevo" onerror="this.src='/img/default-restaurant.jpg'">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Café Nuevo</h3>
+                            <div class="business-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="review-count">36 reseñas</span>
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-coffee"></i> Café
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-map-marker-alt"></i> Del Valle
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="business-card" onclick="location.href='/Restaurantes/detalle-negocio.html?id=4'">
+                        <div class="business-image">
+                            <img src="/img/posole.jpg" alt="El Pozolero" onerror="this.src='/img/default-restaurant.jpg'">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">El Pozolero</h3>
+                            <div class="business-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="review-count">22 reseñas</span>
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-utensils"></i> Comida Mexicana
+                            </div>
+                            <div class="business-details">
+                                <i class="fas fa-map-marker-alt"></i> Centro
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recent activity section -->
+        <section class="activity-section">
+            <div class="activity-container">
+                <h2 class="section-title">Actividad reciente</h2>
+                
+                <div class="activity-grid" id="recent-activity">
+                    <!-- Activity will be loaded dynamically -->
+                    <!-- Example review card -->
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-avatar">
+                                <img src="/img/user-avatar.png" alt="Usuario" onerror="this.src='/img/user-avatar.png'">
+                            </div>
+                            <div class="reviewer-info">
+                                <h4 class="reviewer-name">Carlos Rodríguez</h4>
+                                <div class="review-date">3 de marzo de 2025</div>
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <h4 class="review-business">Pizzeria la Yemi</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="review-text">¡Las mejores pizzas que he probado! La masa es perfecta y los ingredientes son frescos. Definitivamente volveré.</p>
+                        </div>
+                        <div class="review-actions">
+                            <div class="review-action">
+                                <i class="far fa-thumbs-up"></i> Útil
+                            </div>
+                            <div class="review-action">
+                                <i class="far fa-comment"></i> Comentar
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-avatar">
+                                <img src="/img/user-avatar.png" alt="Usuario" onerror="this.src='/img/user-avatar.png'">
+                            </div>
+                            <div class="reviewer-info">
+                                <h4 class="reviewer-name">Ana Gómez</h4>
+                                <div class="review-date">2 de marzo de 2025</div>
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <h4 class="review-business">Taqueria Javi</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <p class="review-text">Tacos muy buenos y auténticos. El servicio es rápido y amable. Solo les falta mejorar un poco la salsa.</p>
+                        </div>
+                        <div class="review-actions">
+                            <div class="review-action">
+                                <i class="far fa-thumbs-up"></i> Útil
+                            </div>
+                            <div class="review-action">
+                                <i class="far fa-comment"></i> Comentar
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-avatar">
+                                <img src="/img/user-avatar.png" alt="Usuario" onerror="this.src='/img/user-avatar.png'">
+                            </div>
+                            <div class="reviewer-info">
+                                <h4 class="reviewer-name">Miguel Ángel</h4>
+                                <div class="review-date">24 de febrero de 2025</div>
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <h4 class="review-business">Café Nuevo</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="review-text">Excelente café de especialidad. El ambiente es tranquilo y perfecto para trabajar. Los pasteles también son deliciosos.</p>
+                        </div>
+                        <div class="review-actions">
+                            <div class="review-action">
+                                <i class="far fa-thumbs-up"></i> Útil
+                            </div>
+                            <div class="review-action">
+                                <i class="far fa-comment"></i> Comentar
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/Resenas/resenas.html" class="see-all-link">Ver todas las reseñas <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Call to action section -->
+        <section class="cta-section">
+            <div class="cta-container">
+                <h2 class="cta-title">¿Tienes un restaurante?</h2>
+                <p class="cta-description">Únete a nuestra comunidad y ayuda a los comensales a encontrar tu negocio. Regístrate gratuitamente hoy mismo.</p>
+                <div class="cta-buttons">
+                    <a href="/Registro/registrar-negocio.html" class="cta-button">Registrar mi negocio</a>
+                    <a href="#" class="cta-button outline">Conocer más</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Acerca de Juarnachaz</h3>
+                    <p>Descubre los tesoros culinarios en tu ciudad. Desde restaurantes locales hasta experiencias gastronómicas únicas, te ayudamos a encontrar lo mejor que tu comunidad tiene para ofrecer.</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Enlaces rápidos</h3>
+                    <ul class="footer-links">
+                        <li><a href="/index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                        <li><a href="/Restaurantes/restaurantes.html"><i class="fas fa-utensils"></i> Restaurantes</a></li>
+                        <li><a href="/Resenas/resenas.html"><i class="fas fa-star"></i> Reseñas</a></li>
+                        <li><a href="/Registro/registrar-negocio.html"><i class="fas fa-store"></i> Registrar negocio</a></li>
+                        <li><a href="/Dashboard/dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <div class="footer-contact"><i class="fas fa-envelope"></i> info@juarnachaz.com</div>
+                    <div class="footer-contact"><i class="fas fa-phone"></i> (123) 456-7890</div>
+                    <div class="footer-contact"><i class="fas fa-map-marker-alt"></i> Av. Principal #123, Ciudad</div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2025 Juarnachaz. Todos los derechos reservados.
+            </div>
+        </footer>
+    </div>
+    <script src="/Resenas/cargar-resenas.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <script type="module" src="firebase.js"></script>
-    <script type="module" src="script.js"></script>
     <script type="module" src="/Nav-Bar/nav-bar.js"></script>
+    <script>
+ // Función para cargar actividad reciente (reseñas)
+// Función mejorada para cargar actividad reciente
+async function loadRecentActivity() {
+    console.log("Iniciando carga de actividad reciente...");
+    const activityContainer = document.getElementById('recent-activity');
+    
+    if (!activityContainer) {
+        console.warn("Contenedor de actividad reciente no encontrado");
+        return;
+    }
+    
+    try {
+        // Primero intentamos cargar desde la API
+        const timestamp = new Date().getTime();
+        let allReviews = [];
+        
+        // Primero necesitamos cargar los negocios
+        console.log("Cargando negocios para obtener reseñas...");
+        const businessesResponse = await fetch(`http://localhost:3001/api/negocios/publicos?t=${timestamp}`);
+        
+        if (!businessesResponse.ok) {
+            throw new Error(`Error al cargar negocios: ${businessesResponse.status} ${businessesResponse.statusText}`);
+        }
+        
+        const businesses = await businessesResponse.json();
+        
+        if (!businesses || businesses.length === 0) {
+            throw new Error('No se encontraron negocios');
+        }
+        
+        console.log(`Se encontraron ${businesses.length} negocios, obteniendo reseñas...`);
+        
+        // Para no hacer demasiadas peticiones, solo tomamos los primeros 5 negocios
+        const businessesToFetch = businesses.slice(0, 5);
+        
+        // Usamos Promise.all para hacer las peticiones en paralelo
+        const reviewsPromises = businessesToFetch.map(business => {
+            return fetch(`http://localhost:3001/api/negocios/${business.id_Negocios}/resenas?t=${timestamp}`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn(`No se pudieron obtener reseñas para el negocio ${business.id_Negocios}`);
+                        return [];
+                    }
+                    return response.json();
+                })
+                .then(reviews => {
+                    // Añadir información del negocio a cada reseña
+                    return reviews.map(review => ({
+                        ...review,
+                        business_name: business.nombre,
+                        business_id: business.id_Negocios,
+                        business_image: business.imagen || business.foto_portada || '/img/default-restaurant.jpg'
+                    }));
+                })
+                .catch(error => {
+                    console.error(`Error al cargar reseñas para negocio ${business.id_Negocios}:`, error);
+                    return [];
+                });
+        });
+        
+        // Esperar a que todas las peticiones terminen
+        const reviewsResults = await Promise.all(reviewsPromises);
+        
+        // Combinar todas las reseñas
+        reviewsResults.forEach(reviews => {
+            allReviews = [...allReviews, ...reviews];
+        });
+        
+        console.log(`Se obtuvieron ${allReviews.length} reseñas en total`);
+        
+        // Si no hay reseñas, mantenemos las de ejemplo
+        if (allReviews.length === 0) {
+            console.log('No se encontraron reseñas, usando las de ejemplo.');
+            // No limpiamos el contenedor, mantenemos las reseñas de ejemplo
+            return;
+        }
+        
+        // Ordenar por fecha (las más recientes primero)
+        allReviews.sort((a, b) => {
+            const dateA = new Date(a.fecha_creacion || a.fecha_resena);
+            const dateB = new Date(b.fecha_creacion || b.fecha_resena);
+            return dateB - dateA;
+        });
+        
+        // Tomar solo las 3 más recientes
+        const recentReviews = allReviews.slice(0, 3);
+        
+        // Limpiar el contenedor
+        activityContainer.innerHTML = '';
+        
+        // Generar el HTML para cada reseña
+        recentReviews.forEach(review => {
+            try {
+                // Formatear fecha
+                const fecha = new Date(review.fecha_creacion || review.fecha_resena);
+                const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Calificación en estrellas
+                const starsHtml = Utils.generateStarsHtml(review.calificacion);
+                
+                // Asegurar que la imagen tenga una ruta válida
+                let imageSrc = review.business_image;
+                if (imageSrc && !imageSrc.startsWith('/') && !imageSrc.startsWith('http')) {
+                    imageSrc = '/' + imageSrc;
+                }
+                
+                // Crear el HTML para la reseña
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                
+                reviewCard.innerHTML = `
+                    <div class="review-header">
+                        <div class="reviewer-avatar">
+                            <img src="/img/user-avatar.png" alt="Usuario" onerror="this.src='/img/user-avatar.png'">
+                        </div>
+                        <div class="reviewer-info">
+                            <h4 class="reviewer-name">${review.nombre_usuario || 'Usuario anónimo'}</h4>
+                            <div class="review-date">${fechaFormateada}</div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <h4 class="review-business">${review.business_name}</h4>
+                        <div class="review-stars">
+                            ${starsHtml}
+                        </div>
+                        <p class="review-text">${review.comentario}</p>
+                    </div>
+                    <div class="review-actions">
+                        <div class="review-action">
+                            <i class="far fa-thumbs-up"></i> Útil
+                        </div>
+                        <div class="review-action">
+                            <i class="far fa-comment"></i> Comentar
+                        </div>
+                    </div>
+                `;
+                
+                activityContainer.appendChild(reviewCard);
+            } catch (formatError) {
+                console.error('Error al formatear reseña:', formatError);
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error al cargar actividad reciente:', error);
+        
+        // Mostrar mensaje de error en lugar de mantener reseñas de ejemplo
+        activityContainer.innerHTML = `
+            <div class="error-message" style="text-align: center; padding: 20px;">
+                <p>Error al cargar reseñas recientes. Inténtalo de nuevo más tarde.</p>
+                <button onclick="loadRecentActivity()" class="btn-retry" style="padding: 8px 16px; margin-top: 10px; background-color: #ff3d00; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Reintentar
+                </button>
+            </div>
+        `;
+    }
+}
 
-</body>
-</html>
+// Cargar negocios destacados
+async function loadFeaturedBusinesses() {
+    const featuredContainer = document.getElementById('featured-businesses');
+    
+    if (!featuredContainer) return;
+    
+    try {
+        // Intentar cargar desde la API
+        const timestamp = new Date().getTime();
+        const response = await Utils.fetchWithRetry(`http://localhost:3001/api/negocios/publicos?t=${timestamp}`);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const businesses = await response.json();
+        
+        if (!businesses || businesses.length === 0) {
+            throw new Error('No se encontraron negocios');
+        }
+        
+        // Limpiar el contenedor
+        featuredContainer.innerHTML = '';
+        
+        // Mostrar los primeros 4 negocios
+        const featuredBusinesses = businesses.slice(0, 4);
+        
+        featuredBusinesses.forEach(business => {
+            // Verificar la imagen
+            let imageSrc = business.imagen || business.foto_portada || '/img/default-restaurant.jpg';
+            
+            // Asegurar que la imagen tenga una ruta válida
+            if (!imageSrc.startsWith('/') && !imageSrc.startsWith('http')) {
+                imageSrc = '/' + imageSrc;
+            }
+            
+            // Categoría del negocio
+            const categoria = business.categoria || 'Restaurante';
+            
+            // Calificación en estrellas
+            const rating = business.promedio_calificaciones || 4.5;
+            
+            // Ubicación
+            const ubicacion = business.colonia || business.municipio || 'Centro';
+            
+            // Generar estrellas HTML
+            const starsHtml = Utils.generateStarsHtml(rating);
+            
+            // Crear el HTML para el negocio
+            const businessCard = document.createElement('div');
+            businessCard.className = 'business-card';
+            businessCard.onclick = function() {
+                window.location.href = `/Restaurantes/detalle-negocio.html?id=${business.id_Negocios}`;
+            };
+            
+            businessCard.innerHTML = `
+                <div class="business-image">
+                    <img src="${imageSrc}" alt="${business.nombre}" onerror="this.src='/img/default-restaurant.jpg'">
+                </div>
+                <div class="business-info">
+                    <h3 class="business-name">${business.nombre}</h3>
+                    <div class="business-rating">
+                        <div class="stars">
+                            ${starsHtml}
+                        </div>
+                        <span class="review-count">${business.total_resenas || 0} reseñas</span>
+                    </div>
+                    <div class="business-details">
+                        <i class="fas fa-utensils"></i> ${categoria}
+                    </div>
+                    <div class="business-details">
+                        <i class="fas fa-map-marker-alt"></i> ${ubicacion}
+                    </div>
+                </div>
+            `;
+            
+            featuredContainer.appendChild(businessCard);
+        });
+        
+    } catch (error) {
+        console.error('Error al cargar negocios destacados:', error);
+        // Mantener los negocios de ejemplo que ya están en el HTML
+    }
+}
+
+// Configurar búsqueda
+function setupSearch() {
+    const searchBtn = document.getElementById('search-btn');
+    const businessSearch = document.getElementById('business-search');
+    const locationSearch = document.getElementById('location-search');
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            performSearch();
+        });
+    }
+    
+    // Buscar al presionar Enter
+    if (businessSearch) {
+        businessSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
+    
+    if (locationSearch) {
+        locationSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
+}
+
+// Realizar búsqueda
+function performSearch() {
+    const businessSearch = document.getElementById('business-search');
+    const locationSearch = document.getElementById('location-search');
+    
+    if (!businessSearch) return;
+    
+    const searchTerm = businessSearch.value.trim();
+    const location = locationSearch ? locationSearch.value.trim() : '';
+    
+    console.log(`Buscando: "${searchTerm}" en "${location}"`);
+    
+    if (searchTerm === '') {
+        alert('Por favor ingresa un término de búsqueda');
+        return;
+    }
+    
+    // Construir URL para la búsqueda
+    let searchUrl = `/Restaurantes/restaurantes.html?q=${encodeURIComponent(searchTerm)}`;
+    
+    if (location) {
+        searchUrl += `&location=${encodeURIComponent(location)}`;
+    }
+    
+    // Redirigir a la página de resultados
+    window.location.href = searchUrl;
+}
+
+// JavaScript para la página principal estilo Yelp
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Inicializando página principal...");
+    
+    // Verificar estado de login
+    checkUserLogin();
+    
+    // Configurar búsqueda
+    setupSearch();
+    
+    // Cargar negocios destacados (opcional)
+    loadFeaturedBusinesses();
+    
+    // Cargar actividad reciente
+    loadRecentActivity();
+    
+    // Event listener para cerrar sesión
+    const cerrarSesionLink = document.getElementById('cerrar-sesion');
+    if (cerrarSesionLink) {
+        cerrarSesionLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        });
+    }
+});
+
+// Función para verificar si el usuario está logueado
+function checkUserLogin() {
+    console.log("Verificando estado de login...");
+    const token = localStorage.getItem('token');
+    const loginLink = document.querySelector('a[href="/Login/Login.html"]');
+    const cerrarSesionLink = document.getElementById('cerrar-sesion');
+    
+    if (token) {
+        console.log("Usuario logueado encontrado");
+        if (loginLink) loginLink.style.display = 'none';
+        if (cerrarSesionLink) cerrarSesionLink.style.display = 'block';
+    } else {
+        console.log("Usuario no logueado");
+        if (loginLink) loginLink.style.display = 'block';
+        if (cerrarSesionLink) cerrarSesionLink.style.display = 'none';
+    }
+}
